@@ -18,8 +18,10 @@ return new class extends Migration
             $table->string('email')->unique()->index();
             $table->string('mobile')->unique()->nullable();
             $table->string('address')->nullable();
+            $table->string('date_of_birth')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
+            $table->tinyInteger('status')->default(0);
             $table->softDeletes();
             $table->rememberToken();
             $table->timestamps();

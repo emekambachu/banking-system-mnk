@@ -5,6 +5,7 @@ namespace App\Models;
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Database\Factories\UserFactory;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -26,7 +27,9 @@ class User extends Authenticatable
         'email',
         'mobile',
         'address',
+        'date_of_birth',
         'password',
+        'status',
     ];
 
     /**
@@ -50,5 +53,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function accountNumber(): HasOne
+    {
+        return $this->hasOne(UserAccountNumber::class, 'user_id');
     }
 }
