@@ -33,7 +33,7 @@ const register = async () => {
         if(response.data.success){
             submitted.value = true;
             if(response.data.user?.roles?.includes("admin")){
-                window.location.href = '/dashboard';
+                window.location.href = '/account/dashboard';
             }
         }
 
@@ -299,9 +299,9 @@ onMounted(() => {
 
                 <div class="mt-6 flex items-center justify-end gap-x-6">
                     <button type="button" class="text-sm/6 font-semibold text-gray-900">Cancel</button>
-                    <button v-if="!loading" type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Register</button>
-                    <button v-else type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
-                        <AnimateSpinIcon class="animate-spin h-5 w-5 text-gray-200" />
+                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <span v-if="!loading">Register</span>
+                        <AnimateSpinIcon v-else class="animate-spin h-5 w-5 text-gray-200" />
                     </button>
                 </div>
             </form>

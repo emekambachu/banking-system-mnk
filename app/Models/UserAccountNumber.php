@@ -16,6 +16,7 @@ class UserAccountNumber extends Model
         'account_number',
         'account_type',
         'currency',
+        'amount',
     ];
 
     public function user(): BelongsTo

@@ -31,7 +31,8 @@ class AccountNumberRepository
             'user_id' => $user->id,
             'account_number' => generateUniqueRandomString(User::class, 'email', 10),
             'account_type' => 'savings',
-            'currency' => 'GBP',
+            'currency' => 'USD',
+            'amount' => 10000.00,
         ]);
     }
 }

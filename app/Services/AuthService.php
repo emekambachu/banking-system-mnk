@@ -55,7 +55,7 @@ class AuthService
             return [
                 'success' => false,
                 'errors' => ['access' => ['Unauthorized']],
-                'status' => 401
+                'status' => 422
             ];
 
         }
@@ -63,7 +63,7 @@ class AuthService
         return [
             'success' => false,
             'errors' => ['access' => ['Incorrect credentials']],
-            'status' => 401
+            'status' => 422
         ];
     }
 

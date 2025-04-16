@@ -3,9 +3,11 @@
 namespace App\Http\Controllers;
 
 use App\Http\Requests\UserRegisterRequest;
+use App\Http\Resources\UserResource;
 use App\Services\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 
 class AuthController extends Controller
@@ -48,6 +50,28 @@ class AuthController extends Controller
                 'success' => false,
                 'errors' => ['server_error' => ['Unexpected error occurred']],
             ], 500);
+
+        }
+    }
+
+    public function authenticate(): JsonResponse
+    {
+        try {
+            $user = Auth::user()->load([
+                'account_number',
+                'roles',
+            ]);
+            return response()->json([
+                'success' => true,
+                'user' => new UserResource($user),
+            ], 200);
+
+        }catch (\Exception $exception){
+            Log::error($exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ], 401);
 
         }
     }

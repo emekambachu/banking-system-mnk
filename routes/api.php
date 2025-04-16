@@ -1,19 +1,28 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserTransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-// This endpoint sets the CSRF cookie
-Route::get('/sanctum/csrf-cookie', function (Request $request) {
-    return response()->json(['message' => 'CSRF cookie set']);
-});
+Route::group(['middleware' => [
+    'auth:sanctum',
+    'api'
+]], function () {
 
-Route::group(['middleware' => 'auth:sanctum'], function () {
-    Route::get('/user', function (Request $request) {
-        return $request->user();
+    Route::get('/authenticate', [AuthController::class, 'authenticate']);
+
+    Route::middleware(['admin'])->group(function () {
+        Route::get('/users', [UserController::class, 'index']);
+        Route::put('/users/{id}/update', [UserController::class, 'update']);
+        Route::post('/users/create', [UserController::class, 'store']);
+        Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);
+
+        Route::get('/users/{id}/transactions', [UserTransactionController::class, 'show']);
     });
+
 });

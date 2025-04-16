@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('account_number')->unique()->index();
             $table->string('account_type');
             $table->string('currency');
+            $table->float('amount')->index();
             $table->softDeletes();
             $table->timestamps();
             $table->engine('InnoDB');

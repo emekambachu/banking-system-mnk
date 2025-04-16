@@ -18,25 +18,43 @@ const login = async () => {
     submitted.value = false;
     loading.value = true;
 
-    try {
-        await axios.get('/sanctum/csrf-cookie');
-        const response = await apiClient.post('/login', form);
-        if (response.data.success) {
-            submitted.value = true;
-            errors.value = {};
-            window.location.href = '/dashboard';
-        }
-        console.log(response.data);
+    axios.get('/sanctum/csrf-cookie')
+        .then(response => {
+            console.log('CSRF cookie has been set:', response.data);
+            // Now perform the login call after CSRF cookie is available.
+            return apiClient.post('/login', form);
+        })
+        .then(response => {
+            console.log('Login response:', response.data);
+            if (response.data.success) {
+                submitted.value = true;
+                errors.value = {};
+                window.location.href = '/account/dashboard';
+            }
+        })
+        .catch(error => {
+            console.error('Error during requests:', error.response ? error.response.data : error);
+        });
 
-    } catch (error) {
-        if (error.response?.status === 422) {
-            errors.value = error.response.data.errors;
-        }
-        if (error.response) {
-            errors.value['server_error'] = ['An error occurred, please try again'];
-            handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response)
-        }
-    }
+    // try {
+    //     await axios.get(`${window.location.origin}/sanctum/csrf-cookie`);
+    //     const response = await apiClient.post('/login', form);
+    //
+    //     if (response.data.success) {
+    //         submitted.value = true;
+    //         errors.value = {};
+    //         window.location.href = '/account/dashboard';
+    //     }
+    //
+    //     console.log(response.data);
+    // } catch (error) {
+    //     if (error.response?.status === 422) {
+    //         errors.value = error.response.data.errors;
+    //     } else if (error.response) {
+    //         errors.value['server_error'] = ['An error occurred, please try again'];
+    //         handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response);
+    //     }
+    // }
 
     loading.value = false;
 };
@@ -57,6 +75,12 @@ onMounted(() => {
                         <h2 class="text-base/7 font-semibold text-gray-900">Login</h2>
                         <p class="mt-1 text-sm/6 text-gray-600">
                             Login to your account
+                        </p>
+                        <p v-if="errors.access" class="text-rose-500 text-sm/6">
+                            {{ errors.access[0] }}
+                        </p>
+                        <p v-if="errors.server_error" class="text-rose-500 text-sm/6">
+                            {{ errors.server_error[0] }}
                         </p>
                     </div>
 
@@ -101,7 +125,10 @@ onMounted(() => {
 
                 <div class="mt-6 flex items-center justify-end gap-x-6">
                     <button type="button" class="text-sm/6 font-semibold text-gray-900">Cancel</button>
-                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Login</button>
+                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <span v-if="!loading">Login</span>
+                        <AnimateSpinIcon v-else class="animate-spin h-5 w-5 text-gray-200" />
+                    </button>
                 </div>
             </form>
         </div>
