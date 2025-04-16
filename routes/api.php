@@ -16,8 +16,11 @@ Route::group(['middleware' => [
 
     Route::get('/authenticate', [AuthController::class, 'authenticate']);
 
+    Route::get('/users/my-transactions', [UserTransactionController::class, 'myTransactions']);
+
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index']);
+        Route::get('/search', [UserController::class, 'search']);
         Route::put('/users/{id}/update', [UserController::class, 'update']);
         Route::post('/users/create', [UserController::class, 'store']);
         Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);

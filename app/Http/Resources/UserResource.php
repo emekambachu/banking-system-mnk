@@ -18,7 +18,9 @@ class UserResource extends JsonResource
             'id' => $this->id,
             'first_name' => $this->first_name ?? null,
             'last_name' => $this->last_name ?? null,
+            'mobile' => $this->mobile ?? null,
             'email' => $this->email ?? null,
+            'address' => $this->address ?? null,
 
             'account_number' => $this->account_number?->account_number ?? null,
             'account_type' => $this->account_number?->account_type ?? null,
@@ -27,6 +29,7 @@ class UserResource extends JsonResource
 
             'roles' => $this->roles?->pluck('slug') ?? [],
 
+            'status' => $this->status ?? null,
             'created_at' => $this->created_at ?? null,
             'updated_at' => $this->updated_at ?? null,
         ];

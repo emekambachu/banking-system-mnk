@@ -81,7 +81,7 @@ onBeforeMount(() => {
                             </RouterLink>
 
                             <RouterLink
-                                :to="{ name:'transactions' }"
+                                :to="{ name:'my-transactions' }"
                                 class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">
                                 Transactions
                             </RouterLink>
@@ -140,7 +140,7 @@ onBeforeMount(() => {
                 </RouterLink>
 
                 <RouterLink
-                    :to="{ name:'transactions' }"
+                    :to="{ name:'my-transactions' }"
                     class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">
                     Transactions
                 </RouterLink>

@@ -1,9 +1,9 @@
 <script setup>
-import {ref, defineEmits, defineProps} from "vue";
+import {ref, defineEmits, defineProps, onMounted} from "vue";
 import TrashIcon from "@/js/components/Icons/TrashIcon.vue";
 import EditIcon from "@/js/components/Icons/EditIcon.vue";
 import SlideOverModal from "@/js/components/Modals/SlideOverModal.vue";
-import UserForm from "@/js/pages/user/UserForm.vue";
+import UserForm from "@/js/pages/account/users/UserForm.vue";
 import apiClient from "@/js/utils/apiClient.js";
 import AnimateSpinIcon from "@/js/components/Icons/AnimateSpinIcon.vue";
 
@@ -44,6 +44,10 @@ const deleteUser = async () => {
   loading.value = false;
 }
 
+onMounted(() => {
+
+});
+
 </script>
 
 <template>
@@ -52,30 +56,48 @@ const deleteUser = async () => {
             {{ index + 1}}
         </th>
         <td class="px-6 py-4">
-            {{ user.name + " " + user.surname }}
+            <p>
+                Name: {{ user.first_name + " " + user.last_name }}
+            </p>
+            <p>
+                Email: {{ user.email }}
+            </p>
+            <p>
+                Mobile: {{ user.mobile }}
+            </p>
+            <p>
+                Address: {{ user.address }}
+            </p>
         </td>
         <td class="px-6 py-4">
-            {{ user.email}}
-        </td>
-        <td class="px-6 py-4">
-            {{ user.phone }}
-        </td>
-        <td class="px-6 py-4">
-            {{ user.country }}
-        </td>
-        <td class="px-6 py-4">
-            {{ user.gender }}
-        </td>
-        <td class="px-6 py-4">
-            <img :src="user.selfie" class="w-10 h-10 rounded-full">
-        </td>
-        <td class="px-6 py-4">
-            {{ user.introduction }}
+            <p>
+                Account Number: {{ user.account_number }}
+            </p>
+            <p>
+                Balance: {{ new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(user.amount) }}
+            </p>
+            <p>
+                Account Type: {{ user.account_type }}
+            </p>
         </td>
         <td class="px-6 py-4">
             <div class="flex">
-                <EditIcon width="20" height="20" class="cursor-pointer" @click.prevent="showEditForm = !showEditForm"/>
-                <TrashIcon width="20" height="20" class="cursor-pointer" @click.prevent="showDeleteForm = !showDeleteForm"/>
+                <router-link
+                    :to="{ name: 'transactions', params: { id: user.id } }">
+                    <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mr-2 rounded">
+                        Transactions
+                    </button>
+                </router-link>
+                <button
+                    @click.prevent="showEditForm = !showEditForm"
+                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 mr-2 rounded">
+                    Edit
+                </button>
+                <button
+                    @click.prevent="showDeleteForm = !showDeleteForm"
+                    class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded">
+                    Delete
+                </button>
             </div>
         </td>
     </tr>

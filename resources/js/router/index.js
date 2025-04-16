@@ -45,7 +45,12 @@ const router = createRouter({
                     component: () => import('@/js/pages/account/users/UserList.vue'),
                 },
                 {
-                    path: 'transactions',
+                    path: 'my-transactions',
+                    name: 'my-transactions',
+                    component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
+                },
+                {
+                    path: 'transactions/:id',
                     name: 'transactions',
                     component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
                 },

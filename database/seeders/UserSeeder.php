@@ -47,7 +47,7 @@ class UserSeeder extends Seeder
 
         if(!$getAdminUser){
             User::factory(1)->create()->each(function ($user) use ($adminRoleId) {
-                UserRole::factory(1)->create([
+                UserRole::create([
                     'user_id' => $user->id,
                     'role_id' => $adminRoleId->id,
                 ]);
@@ -65,7 +65,7 @@ class UserSeeder extends Seeder
                 'user_id' => $user->id,
             ]);
 
-            UserRole::factory(1)->create([
+            UserRole::create([
                 'user_id' => $user->id,
                 'role_id' => 2, // Assuming 2 is the ID for the user role
             ]);
