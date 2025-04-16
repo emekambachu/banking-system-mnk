@@ -50,7 +50,7 @@ onMounted(() => {
 <template>
     <div class="grid grid-cols-1 gap-4">
         <div class="w-full lg:w-1/4 mx-auto bg-white drop-shadow-lg rounded-lg p-6 my-6">
-            <form>
+            <form @submit.prevent="login">
                 <div class="space-y-8">
 
                     <div class="border-b border-gray-900/10 pb-6">

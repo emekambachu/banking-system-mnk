@@ -15,12 +15,12 @@ class UserRepository
         $this->user = new User();
     }
 
-    public function storeUser(array $data): Model|Collection|Builder|array|null
+    public function storeUser(array $data)
     {
         return $this->user->create($data);
     }
 
-    public function getUsers($select = [], $relations = []): Builder
+    public function getUsers($select = [], $relations = []): Builder|User
     {
         $query = $this->user;
 

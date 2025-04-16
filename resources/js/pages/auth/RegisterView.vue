@@ -32,6 +32,9 @@ const register = async () => {
         let response = await apiClient.post(`/register`, form);
         if(response.data.success){
             submitted.value = true;
+            if(response.data.user?.roles?.includes("admin")){
+                window.location.href = '/dashboard';
+            }
         }
 
     } catch (error) {
@@ -108,9 +111,6 @@ onMounted(() => {
                         <p class="mt-1 text-sm/6 text-gray-600">
                             Create your account
                         </p>
-                        <small v-if="errors.server_error" class="text-rose-500">
-                            {{ errors.server_error[0] }}
-                        </small>
                     </div>
 
                     <div class="border-b border-gray-900/10 pb-12">
@@ -277,8 +277,15 @@ onMounted(() => {
 
                             <!--Alerts-->
                             <div class="sm:col-span-full">
-                                <p v-if="errors.server_error" class="text-rose-500">
-                                    {{ errors.server_error[0] }}
+                                <p
+                                    v-if="errors.server_error && Object.keys(errors).length > 0" class="text-rose-500 text-center"
+                                >
+                                    There are errors in your form, please check and try again
+                                </p>
+                                <p
+                                    v-if="errors.server_error && Object.keys(errors).length === 0" class="text-rose-500 text-center"
+                                >
+                                    Server error occurred, please try again
                                 </p>
                                 <div v-if="submitted" class="bg-emerald-300 p-2 text-center">
                                     <p>Registration completed, you will be able to login upon approval</p>

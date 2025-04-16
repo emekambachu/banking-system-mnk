@@ -28,7 +28,7 @@ class UserRegisterRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'email' => 'required|email|unique:users,email',
-            'mobile' => 'nullable|string|max:15',
+            'mobile' => 'nullable|string|max:15|unique:users,mobile',
             'address' => 'nullable|string|max:255',
             'date_of_birth' => 'required',
             'password' => 'required|string|min:8|confirmed',

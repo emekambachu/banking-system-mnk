@@ -2,6 +2,8 @@
 
 namespace App\Services;
 
+use App\Http\Resources\UserResource;
+use App\Models\User;
 use App\Repositories\AccountNumberRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
@@ -70,10 +72,7 @@ class AuthService
         // Logic for user logout
     }
 
-    /**
-     * @throws RandomException
-     */
-    public function register($userData): Model|Collection|Builder|array|null
+    public function register($userData): array
     {
         $userData['password'] = Hash::make($userData['password']);
 
@@ -83,17 +82,20 @@ class AuthService
             $this->accountNumberRepository->createAccountNumberForUser($user);
 
             $totalUsers = $this->userRepository->getUsers()->count();
-            if($totalUsers === 0) {
-                $this->roleRepository->getRoleBySlug('super-admin')->users()->attach($user->id);
+
+            if($totalUsers === 1) {
+                $this->roleRepository->getRoleBySlug('admin')->users()->attach($user->id);
             }else{
                 $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
             }
+
+            $userData = $this->userRepository->getUserById($user->id, ['roles', 'account_number'], ['id']);
 
             DB::commit();
 
             return [
                 'success' => true,
-                'user' => $user,
+                'user' => new UserResource($userData),
                 'message' => 'User Created Successfully',
                 'status' => 200,
             ];
@@ -105,6 +107,7 @@ class AuthService
             return [
                 'success' => false,
                 'message' => 'Error creating user',
+                'user' => null,
                 'status' => 500,
             ];
         }

@@ -21,11 +21,8 @@ class AuthController extends Controller
     public function register(UserRegisterRequest $request): JsonResponse
     {
         try {
-            $response = $this->authService->register($request);
-            return response()->json([
-                'success' => $response['success'],
-                'message' => $response['message'],
-            ], $response['status']);
+            $response = $this->authService->register($request->all());
+            return response()->json($response, $response['status']);
 
         }catch (\Exception $exception){
 
@@ -42,10 +39,7 @@ class AuthController extends Controller
     {
         try {
             $response = $this->authService->login($request);
-            return response()->json([
-                'success' => $response['success'],
-                'token' => $response['token'],
-            ], $response['status']);
+            return response()->json($response, $response['status']);
 
         }catch (\Exception $exception){
 

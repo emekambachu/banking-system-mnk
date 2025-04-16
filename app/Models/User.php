@@ -57,12 +57,12 @@ class User extends Authenticatable
         ];
     }
 
-    public function accountNumber(): HasOne
+    public function account_number(): HasOne
     {
         return $this->hasOne(UserAccountNumber::class, 'user_id');
     }
 
-    public function belongsToManyRoles(): BelongsToMany
+    public function roles(): BelongsToMany
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
