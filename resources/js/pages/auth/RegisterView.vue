@@ -4,9 +4,12 @@ import handleErrors from "@/js/utils/handleErrors.js";
 import apiClient from "@/js/utils/apiClient.js";
 import formValidations from "@/js/utils/formValidations.js";
 import AnimateSpinIcon from "@/js/components/Icons/AnimateSpinIcon.vue";
+import EyeCloseIcon from "@/js/components/Icons/EyeCloseIcon.vue";
+import EyeOpenIcon from "@/js/components/Icons/EyeOpenIcon.vue";
 
 const loading = ref(false);
 const submitted = ref(false);
+const showPassword = ref(false);
 let errors = ref({});
 
 let form = reactive({
@@ -26,7 +29,7 @@ const register = async () => {
     loading.value = true;
 
     try {
-        let response = await apiClient.post(`/users/${user.value.id}`, formData);
+        let response = await apiClient.post(`/register`, form);
         if(response.data.success){
             submitted.value = true;
         }
@@ -36,12 +39,16 @@ const register = async () => {
             errors.value = error.response.data.errors;
         }
         if (error.response) {
-            errors.value['general'] = ['An error occurred, please try again'];
+            errors.value['server_error'] = ['An error occurred, please try again'];
             handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response)
         }
     }
     loading.value = false;
 };
+
+const togglePassword = () => {
+    showPassword.value = !showPassword.value;
+}
 
 const validatePhone = (event) => {
     if(form.mobile === ""){
@@ -93,7 +100,7 @@ onMounted(() => {
 <template>
     <div class="grid grid-cols-1 gap-4">
         <div class="w-full lg:w-1/4 mx-auto bg-white drop-shadow-lg rounded-lg p-6 my-6">
-            <form>
+            <form @submit.prevent="register">
                 <div class="space-y-8">
 
                     <div class="border-b border-gray-900/10 pb-6">
@@ -101,6 +108,9 @@ onMounted(() => {
                         <p class="mt-1 text-sm/6 text-gray-600">
                             Create your account
                         </p>
+                        <small v-if="errors.server_error" class="text-rose-500">
+                            {{ errors.server_error[0] }}
+                        </small>
                     </div>
 
                     <div class="border-b border-gray-900/10 pb-12">
@@ -116,7 +126,7 @@ onMounted(() => {
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     >
-                                    <small v-if="errors.first_name">
+                                    <small v-if="errors.first_name" class="text-rose-500">
                                         {{ errors.first_name[0] }}
                                     </small>
                                 </div>
@@ -132,7 +142,7 @@ onMounted(() => {
                                         v-model="form.last_name"
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                    <small v-if="errors.last_name">
+                                    <small v-if="errors.last_name" class="text-rose-500">
                                         {{ errors.last_name[0] }}
                                     </small>
                                 </div>
@@ -150,7 +160,7 @@ onMounted(() => {
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     >
-                                    <small v-if="errors.email">
+                                    <small v-if="errors.email" class="text-rose-500">
                                         {{ errors.email[0] }}
                                     </small>
                                 </div>
@@ -161,12 +171,12 @@ onMounted(() => {
                                 <div class="mt-2">
                                     <input
                                         id="mobile"
-                                        name="email"
-                                        type="email"
-                                        autocomplete="email"
+                                        type="text"
+                                        autocomplete="mobile"
                                         v-model="form.mobile"
+                                        @change="validatePhone"
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                    <small v-if="errors.mobile">
+                                    <small v-if="errors.mobile" class="text-rose-500">
                                         {{ errors.mobile[0] }}
                                     </small>
                                 </div>
@@ -198,36 +208,80 @@ onMounted(() => {
                                         v-model="form.date_of_birth"
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                    <small v-if="errors.date_of_birth">
+                                    <small v-if="errors.date_of_birth" class="text-rose-500">
                                         {{ errors.first_name[0] }}
                                     </small>
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div class="sm:col-span-full">
                                 <label for="password" class="block text-sm/6 font-medium text-gray-900">Password</label>
-                                <div class="mt-2">
-                                    <input id="password" type="password"
+                                <div class="mt-2 flex">
+                                    <input
+                                        id="password"
+                                        :type="showPassword ? 'text' : 'password'"
                                         v-model="form.password"
-                                           required
-                                           class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        @change="validatePassword($event, form.password, form.password_confirmation)"
+                                        required
+                                        class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                    >
+                                    <span>
+                                        <EyeCloseIcon
+                                            v-if="!showPassword"
+                                            @click.prevent="togglePassword"
+                                            :width="'30'"
+                                            class="text-gray-500"
+                                        />
+                                        <EyeOpenIcon
+                                            v-else
+                                            @click.prevent="togglePassword"
+                                            :width="'30'"
+                                            class="text-gray-500"
+                                        />
+                                    </span>
                                 </div>
-                                <small v-if="errors.password">
+                                <small v-if="errors.password" class="text-rose-500">
                                     {{ errors.password[0] }}
                                 </small>
                             </div>
 
-                            <div class="sm:col-span-3">
+                            <div class="sm:col-span-full">
                                 <label for="password_confirm" class="block text-sm/6 font-medium text-gray-900">
-                                    password Confirm
+                                    Password Confirm
                                 </label>
-                                <div class="mt-2">
+                                <div class="mt-2 flex">
                                     <input
                                         id="password_confirm"
-                                        type="password"
+                                        :type="showPassword ? 'text' : 'password'"
                                         v-model="form.password_confirmation"
+                                        @change="validatePassword($event, form.password, form.password_confirmation)"
                                         required
-                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        class="w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                    >
+                                    <span>
+                                        <EyeCloseIcon
+                                            v-if="!showPassword"
+                                            @click.prevent="togglePassword"
+                                            :width="'30'"
+                                            class="text-gray-500"
+                                        />
+                                        <EyeOpenIcon
+                                            v-else
+                                            @click.prevent="togglePassword"
+                                            :width="'30'"
+                                            class="text-gray-500"
+                                        />
+                                    </span>
+                                </div>
+                            </div>
+
+                            <!--Alerts-->
+                            <div class="sm:col-span-full">
+                                <p v-if="errors.server_error" class="text-rose-500">
+                                    {{ errors.server_error[0] }}
+                                </p>
+                                <div v-if="submitted" class="bg-emerald-300 p-2 text-center">
+                                    <p>Registration completed, you will be able to login upon approval</p>
                                 </div>
                             </div>
 
@@ -238,7 +292,10 @@ onMounted(() => {
 
                 <div class="mt-6 flex items-center justify-end gap-x-6">
                     <button type="button" class="text-sm/6 font-semibold text-gray-900">Cancel</button>
-                    <button type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Register</button>
+                    <button v-if="!loading" type="submit" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">Register</button>
+                    <button v-else type="button" class="rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-indigo-500 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-indigo-600">
+                        <AnimateSpinIcon class="animate-spin h-5 w-5 text-gray-200" />
+                    </button>
                 </div>
             </form>
         </div>

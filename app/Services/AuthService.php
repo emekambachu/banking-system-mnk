@@ -42,12 +42,10 @@ class AuthService
 
             if ($user) {
                 // Get Token
-                $expiresAt = Carbon::now()->addHours(48); // Token will expire in 2 days
-                $token = $user->createToken($request->email, ['*'], $expiresAt)->plainTextToken;
+                $request->session()->regenerate();
 
                 return [
                     'success' => true,
-                    'token' => $token,
                     'status' => 200
                 ];
             }

@@ -13,7 +13,7 @@ const formValidations = {
             );
     },
 
-    validateMobileNumber(mobile) {
+    validateInternationalMobileNumber(mobile) {
         if (mobile === undefined || mobile === null || mobile === '') {
             return false;
         }
@@ -22,6 +22,15 @@ const formValidations = {
             .match(
                 /^\+[0-9]+$/
             );
+    },
+
+    validateMobileNumber(mobile) {
+        if (mobile === undefined || mobile === null || mobile === '') {
+            return false;
+        }
+
+        return String(mobile)
+            .match(/^[0-9]+$/) && mobile.length <= 11;
     },
 
     emailConfirmation(email, emailConfirmation){

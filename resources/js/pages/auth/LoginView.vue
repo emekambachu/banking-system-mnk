@@ -1,8 +1,8 @@
 <script setup>
 import {ref, onMounted, reactive} from 'vue';
 import handleErrors from "@/js/utils/handleErrors.js";
-import apiClient from "@/js/utils/apiClient.js";
 import AnimateSpinIcon from "@/js/components/Icons/AnimateSpinIcon.vue";
+import apiClient from "@/js/utils/apiClient.js";
 
 const loading = ref(false);
 const submitted = ref(false);
@@ -19,20 +19,25 @@ const login = async () => {
     loading.value = true;
 
     try {
-        let response = await apiClient.post(`/users/${user.value.id}`, formData);
-        if(response.data.success){
+        await axios.get('/sanctum/csrf-cookie');
+        const response = await apiClient.post('/login', form);
+        if (response.data.success) {
             submitted.value = true;
+            errors.value = {};
+            window.location.href = '/dashboard';
         }
+        console.log(response.data);
 
     } catch (error) {
         if (error.response?.status === 422) {
             errors.value = error.response.data.errors;
         }
         if (error.response) {
-            errors.value['general'] = ['An error occurred, please try again'];
+            errors.value['server_error'] = ['An error occurred, please try again'];
             handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response)
         }
     }
+
     loading.value = false;
 };
 
@@ -70,7 +75,7 @@ onMounted(() => {
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     >
-                                    <small v-if="errors.email">
+                                    <small v-if="errors.email" class="text-rose-500">
                                         {{ errors.email[0] }}
                                     </small>
                                 </div>
@@ -83,7 +88,7 @@ onMounted(() => {
                                            v-model="form.password"
                                            required
                                            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
-                                    <small v-if="errors.password">
+                                    <small v-if="errors.password" class="text-rose-500">
                                         {{ errors.password[0] }}
                                     </small>
                                 </div>
