@@ -45,8 +45,13 @@ const toggleMobileMenu = () => {
                     <div class="hidden sm:ml-6 sm:block">
                         <div class="flex space-x-4">
                             <!-- Current: "bg-gray-900 text-white", Default: "text-gray-300 hover:bg-gray-700 hover:text-white" -->
-                            <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Register</a>
-                            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Login</a>
+
+                            <RouterLink :to="{ name:'register' }" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Register</RouterLink>
+
+                            <RouterLink :to="{ name:'login' }" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Login</RouterLink>
+
+<!--                            <a href="#" class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">Register</a>-->
+<!--                            <a href="#" class="rounded-md px-3 py-2 text-sm font-medium text-gray-300 hover:bg-gray-700 hover:text-white">Login</a>-->
                         </div>
                     </div>
                 </div>

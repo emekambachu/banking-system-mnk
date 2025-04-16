@@ -78,9 +78,9 @@ const showDateForEighteenYearsOld = () => {
 const clearDateIfLessThanEighteenYearsOld = () => {
     const today = new Date();
     const seventeenYearsAgo = new Date(today.getFullYear() - 17, today.getMonth(), today.getDate());
-    const dateOfBirth = new Date(document.getElementById('date_of_birth').value);
+    const dateOfBirth = new Date(form.date_of_birth);
     if (dateOfBirth > seventeenYearsAgo) {
-        document.getElementById('date_of_birth').value = '';
+        form.date_of_birth = '';
     }
 };
 
@@ -116,6 +116,9 @@ onMounted(() => {
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     >
+                                    <small v-if="errors.first_name">
+                                        {{ errors.first_name[0] }}
+                                    </small>
                                 </div>
                             </div>
 
@@ -129,10 +132,13 @@ onMounted(() => {
                                         v-model="form.last_name"
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                    <small v-if="errors.last_name">
+                                        {{ errors.last_name[0] }}
+                                    </small>
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-4">
+                            <div class="sm:col-span-full">
                                 <label for="email" class="block text-sm/6 font-medium text-gray-900">Email address</label>
                                 <div class="mt-2">
                                     <input
@@ -144,10 +150,13 @@ onMounted(() => {
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
                                     >
+                                    <small v-if="errors.email">
+                                        {{ errors.email[0] }}
+                                    </small>
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-4">
+                            <div class="sm:col-span-full">
                                 <label for="mobile" class="block text-sm/6 font-medium text-gray-900">Mobile</label>
                                 <div class="mt-2">
                                     <input
@@ -157,6 +166,9 @@ onMounted(() => {
                                         autocomplete="email"
                                         v-model="form.mobile"
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                    <small v-if="errors.mobile">
+                                        {{ errors.mobile[0] }}
+                                    </small>
                                 </div>
                             </div>
 
@@ -168,11 +180,12 @@ onMounted(() => {
                                     <input
                                         type="text" name="address" id="address" autocomplete="address"
                                         v-model="form.address"
-                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                        class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6"
+                                    >
                                 </div>
                             </div>
 
-                            <div class="sm:col-span-4">
+                            <div class="sm:col-span-full">
                                 <label for="date_of_birth" class="block text-sm/6 font-medium text-gray-900">
                                     Date of Birth
                                 </label>
@@ -181,10 +194,13 @@ onMounted(() => {
                                         id="date_of_birth"
                                         type="date"
                                         :max="maxDate"
-                                        @onchange="clearDateIfLessThanEighteenYearsOld"
+                                        @change="clearDateIfLessThanEighteenYearsOld"
                                         v-model="form.date_of_birth"
                                         required
                                         class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
+                                    <small v-if="errors.date_of_birth">
+                                        {{ errors.first_name[0] }}
+                                    </small>
                                 </div>
                             </div>
 
@@ -196,6 +212,9 @@ onMounted(() => {
                                            required
                                            class="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-2 focus:-outline-offset-2 focus:outline-indigo-600 sm:text-sm/6">
                                 </div>
+                                <small v-if="errors.password">
+                                    {{ errors.password[0] }}
+                                </small>
                             </div>
 
                             <div class="sm:col-span-3">

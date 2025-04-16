@@ -19,6 +19,7 @@ return new class extends Migration
             $table->string('currency');
             $table->softDeletes();
             $table->timestamps();
+            $table->engine('InnoDB');
         });
     }
 
