@@ -12,12 +12,12 @@ const router = createRouter({
 
             children: [
                 {
-                    path: ['/', '/register'],
+                    path: '/',
                     name: 'register',
                     component: () => import('@/js/pages/auth/RegisterView.vue'),
                 },
                 {
-                    path: '/login',
+                    path: 'login',
                     name: 'login',
                     component: () => import('@/js/pages/auth/LoginView.vue'),
                 },
@@ -31,22 +31,22 @@ const router = createRouter({
 
             children: [
                 {
-                    path: '/dashboard',
+                    path: 'dashboard',
                     name: 'dashboard',
                     component: () => import('@/js/pages/account/DashboardView.vue'),
                 },
                 {
-                    path: '/users',
+                    path: 'users',
                     name: 'users',
                     component: () => import('@/js/pages/account/users/UserList.vue'),
                 },
                 {
-                    path: '/transactions',
+                    path: 'transactions',
                     name: 'transactions',
                     component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
                 },
                 {
-                    path: '/funds-transfer',
+                    path: 'funds-transfer',
                     name: 'funds-transfer',
                     component: () => import('@/js/pages/account/funds-transfer/FundsTransferView.vue'),
                 },

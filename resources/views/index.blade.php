@@ -15,11 +15,11 @@
 </head>
 <body class="bg-[#FDFDFC] w-screen h-screen">
 
-<div id="app">
-    <router-view
-        :csrf_token="{{ json_encode(csrf_token()) }}"
-    ></router-view>
-</div>
+    <div id="app">
+        <router-view
+            :csrf_token="{{ json_encode(csrf_token()) }}"
+        ></router-view>
+    </div>
 
 </body>
 </html>
