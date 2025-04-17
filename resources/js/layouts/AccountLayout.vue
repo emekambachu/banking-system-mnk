@@ -15,8 +15,23 @@ const toggleProfileDropDown = () => {
     showProfileDropDown.value = !showProfileDropDown.value;
 }
 
-onBeforeMount(() => {
+const authenticateUser = async () => {
+    try {
+        await axios.get('/sanctum/csrf-cookie');
+        const response = await apiClient.get('/authenticate');
+        if(response.data.success){
+            user.value = response.data.user;
+        } else {
+            window.location.href = '/login';
+        }
+    } catch (error) {
+        handleErrors.hideErrorInProduction('Auth Error', error.response);
+        window.location.href = '/login';
+    }
+};
 
+onBeforeMount(() => {
+    authenticateUser();
 });
 </script>
 

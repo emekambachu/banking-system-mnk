@@ -22,7 +22,7 @@ class UserResource extends JsonResource
             'email' => $this->email ?? null,
             'address' => $this->address ?? null,
 
-            'account_number' => $this->account->account_number ?? null,
+            'account_number' => $this->account?->account_number ?? null,
             'account_type' => $this->account?->account_type ?? null,
             'currency' => $this->account?->currency ?? null,
             'amount' => $this->account?->amount ?? 0.00,

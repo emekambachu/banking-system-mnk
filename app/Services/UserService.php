@@ -63,8 +63,6 @@ class UserService
 
             })->distinct()->paginate(10);
 
-        dd(UserResource::collection($users)->response()->getData(true));
-
         // if a result exists return results, else return empty array
         if($users->total() > 0){
             return [

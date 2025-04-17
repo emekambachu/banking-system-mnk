@@ -15,6 +15,7 @@ const pagination = ref({
 });
 const loading = ref(false);
 const showForm = ref(false);
+
 const form = reactive({
     search_value: '',
     balance_greater_than: '',
@@ -22,6 +23,8 @@ const form = reactive({
     date_joined_from: '',
     date_joined_before: '',
 });
+
+const searchValues = ref([]);
 
 const getUsers = async (page = 1, type = 'get') => {
     loading.value = true;
@@ -31,7 +34,6 @@ const getUsers = async (page = 1, type = 'get') => {
         let response;
         if(type === 'get') {
             response = await apiClient.get('/users?page=' + page);
-
         } else {
             if(form.search_value === '' && form.balance_greater_than === '' && form.balance_less_than === '' && form.date_joined_from === '' && form.date_joined_before === '') {
                 return false;
@@ -46,6 +48,12 @@ const getUsers = async (page = 1, type = 'get') => {
             pagination.value.meta = response.data.users.meta;
             total.value = response.data.total;
             console.log(response.data.users);
+
+            if(type === 'search') {
+                searchValues.value = response.data.search_values;
+            } else {
+                searchValues.value = [];
+            }
         }
 
     } catch (error) {
@@ -77,6 +85,12 @@ onMounted(() => {
     </div>
 
     <div class="relative bg-gray-600 p-3 text-white">
+        <div v-if="searchValues.length" class="flex items-center justify-center text-lg">
+            <span class="font-bold mr-1">{{ total }} results for</span>
+            <p v-for="(result, index) in searchValues" :key="index">
+                {{ result+', ' }}
+            </p>
+        </div>
         <form @submit.prevent="getUsers(1, 'search')" class="w-full">
             <div class="grid grid-cols-5 gap-2">
                 <div class="col-span-1">
@@ -141,7 +155,6 @@ onMounted(() => {
                 </div>
             </div>
         </form>
-
     </div>
 
     <div class="relative overflow-x-auto">
