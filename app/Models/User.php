@@ -57,7 +57,7 @@ class User extends Authenticatable
         ];
     }
 
-    public function account_number(): HasOne
+    public function account(): HasOne
     {
         return $this->hasOne(UserAccountNumber::class, 'user_id');
     }

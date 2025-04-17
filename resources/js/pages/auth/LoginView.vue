@@ -18,43 +18,25 @@ const login = async () => {
     submitted.value = false;
     loading.value = true;
 
-    axios.get('/sanctum/csrf-cookie')
-        .then(response => {
-            console.log('CSRF cookie has been set:', response.data);
-            // Now perform the login call after CSRF cookie is available.
-            return apiClient.post('/login', form);
-        })
-        .then(response => {
-            console.log('Login response:', response.data);
-            if (response.data.success) {
-                submitted.value = true;
-                errors.value = {};
-                window.location.href = '/account/dashboard';
-            }
-        })
-        .catch(error => {
-            console.error('Error during requests:', error.response ? error.response.data : error);
-        });
+    try {
+        await axios.get(`/sanctum/csrf-cookie`);
+        const response = await apiClient.post('/login', form);
 
-    // try {
-    //     await axios.get(`${window.location.origin}/sanctum/csrf-cookie`);
-    //     const response = await apiClient.post('/login', form);
-    //
-    //     if (response.data.success) {
-    //         submitted.value = true;
-    //         errors.value = {};
-    //         window.location.href = '/account/dashboard';
-    //     }
-    //
-    //     console.log(response.data);
-    // } catch (error) {
-    //     if (error.response?.status === 422) {
-    //         errors.value = error.response.data.errors;
-    //     } else if (error.response) {
-    //         errors.value['server_error'] = ['An error occurred, please try again'];
-    //         handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response);
-    //     }
-    // }
+        if (response.data.success) {
+            submitted.value = true;
+            errors.value = {};
+            window.location.href = '/account/dashboard';
+        }
+
+        console.log(response.data);
+    } catch (error) {
+        if (error.response?.status === 422) {
+            errors.value = error.response.data.errors;
+        } else if (error.response) {
+            errors.value['server_error'] = ['An error occurred, please try again'];
+            handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response);
+        }
+    }
 
     loading.value = false;
 };

@@ -15,6 +15,11 @@ class UserRepository
         $this->user = new User();
     }
 
+    public function user(): User
+    {
+        return $this->user;
+    }
+
     public function storeUser(array $data)
     {
         return $this->user->create($data);
@@ -74,7 +79,7 @@ class UserRepository
             $query = $query->select($select);
         }
 
-        return $query->whereHas('accountNumber', function ($query) use ($accountNumber) {
+        return $query->whereHas('account', function ($query) use ($accountNumber) {
             $query->where('account_number', $accountNumber);
         })->first();
     }

@@ -69,11 +69,12 @@ const router = createRouter({
 // Helper function to check authentication.
 const authenticateUser = async () => {
     try {
-        await axios.get(`${window.location.origin}/sanctum/csrf-cookie`);
+        await axios.get(`/sanctum/csrf-cookie`);
         const response = await apiClient.get('/authenticate');
         if(response.data.success){
             return true;
         } else {
+            handleErrors.hideErrorInProduction('Un-authorized', response.data);
             window.location.href = '/login';
         }
     } catch (error) {
@@ -90,7 +91,7 @@ router.beforeEach(async (to, from, next) => {
             next();
         } catch (err) {
             // Redirect to the login page if not authenticated
-            next({ name: 'Login' });
+            window.location.href = '/login';
         }
     } else {
         next();

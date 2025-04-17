@@ -22,10 +22,10 @@ class UserResource extends JsonResource
             'email' => $this->email ?? null,
             'address' => $this->address ?? null,
 
-            'account_number' => $this->account_number?->account_number ?? null,
-            'account_type' => $this->account_number?->account_type ?? null,
-            'currency' => $this->account_number?->currency ?? null,
-            'amount' => $this->account_number?->amount ?? 0.00,
+            'account_number' => $this->account->account_number ?? null,
+            'account_type' => $this->account?->account_type ?? null,
+            'currency' => $this->account?->currency ?? null,
+            'amount' => $this->account?->amount ?? 0.00,
 
             'roles' => $this->roles?->pluck('slug') ?? [],
 

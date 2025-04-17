@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Resources\UserResource;
 use App\Repositories\UserRepository;
 
 class UserService
@@ -12,93 +13,73 @@ class UserService
         $this->userRepository = $userRepository;
     }
 
-    public function search($data){
+    public function search($inputs): array
+    {
+        $searchResults = [];
+        foreach ($inputs as $key => $input) {
+            if($key === 'balance_greater_than' && !empty($input)){
+                $searchResults[] = 'Balance greater than ' . $input;
+            }
+            if($key === 'balance_less_than' && !empty($input)){
+                $searchResults[] = 'Balance less than ' . $input;
+            }
+            if($key === 'date_joined_before' && !empty($input)){
+                $searchResults[] = 'Date joined before ' . $input;
+            }
+            if($key === 'date_joined_from' && !empty($input)){
+                $searchResults[] = 'Date joined from ' . $input;
+            }
+            if($key === 'search_value' && !empty($input)){
+                $searchResults[] = $input;
+            }
+        }
+
         $users = $this->userRepository->getUsers(
-            ['id', 'first_name', 'last_name', 'mobile', 'email', 'address', 'created_at'],
-            ['account_number', 'roles']
-        )
-            ->where(function($query) use ($data) {
+            ['users.*','users.id AS user_id', 'user_account_numbers.*', 'user_account_numbers.id AS account_number_id'],
+            ['account', 'roles']
 
-                $query->when(!empty($input['term']), static function ($q) use ($input) {
-                    $split = explode(' ', $input['term']);
-                    // for first and last name search
+        )->leftjoin('user_account_numbers', 'user_account_numbers.user_id', '=', 'users.id')
+            ->where(function($query) use ($inputs){
+                $query->when(!empty($inputs['search_value']), static function($q) use($inputs){
+                    $q->where('users.first_name', 'like' , '%'. $inputs['search_value'] .'%')
+                        ->orWhere('users.last_name', 'like' , '%'. $inputs['search_value'] .'%')
+                        ->orWhere('users.email', 'like' , '%'. $inputs['search_value'] .'%')
+                        ->orWhere('users.mobile', 'like' , '%'. $inputs['search_value'] .'%')
+                        ->orWhere('users.address', 'like' , '%'. $inputs['search_value'] .'%')
+                        ->orWhere('user_account_numbers.account_number', 'like' , '%'. $inputs['search_value'] .'%');
 
-                    if(isset($split[0], $split[1], $split[2])) {
-                        $q->where('users.first_name', $split[0])
-                            ->where('users.middle_name', $split[1])
-                            ->where('users.last_name', $split[2]);
+                })->when(!empty($inputs['balance_greater_than']), static function ($query) use($inputs){
+                    $query->where('user_account_numbers.amount', '>=', $inputs['balance_greater_than']);
 
-                    }elseif(isset($split[0], $split[1])) {
-                        $q->where('users.first_name', $split[0])
-                            ->where('users.last_name', $split[1])
-                            ->orWhere('users.middle_name', $split[1]);
+                })->when(!empty($inputs['balance_less_than']), static function ($query) use($inputs){
+                    $query->where('user_account_numbers.amount', '>=', $inputs['balance_less_than']);
 
-                    }else{
-                        $q->where('users.first_name', 'like', '%' . $input['term'] . '%')
-                            ->orWhere('users.last_name', 'like', '%' . $input['term'] . '%')
-                            ->orWhere('users.email', 'like', '%' . $input['term'] . '%')
-                            ->orWhere('users.country_iso', $input['term'])
-                            ->orWhere('application_businesses.business_name', 'like', '%' . $input['term'] . '%');
-                    }
+                })->when(!empty($inputs['date_joined_before']), static function ($query) use($inputs){
+                    $query->where('users.created_at', '>=', $inputs['date_joined_before']);
+
+                })->when(!empty($inputs['date_joined_from']), static function ($query) use($inputs){
+                    $query->where('users.created_at', '<=', $inputs['date_joined_from']);
                 });
 
-            })
-            ->when(!empty($input['country_residence_id']), static function ($q) use($input) {
+            })->distinct()->paginate(10);
 
-                // join country_residence and country_residence_iso to get country name
-                // if cohort 1 is selected in the filter, use a different country table
-                if(!empty($input['cohort']) && $input['cohort'] === 1) {
-                    $q->where('users.country_id', $input['country_residence_id']);
-                }else{
-                    $q->where('users.country_residence_id', $input['country_residence_id'])
-                        ->orWhere('country_residence_iso.id', $input['country_residence_id']);
-                }
-            })
-            ->when(!empty($input['dob_start']), static function ($q) use($input) {
-                $q->where('users.date_of_birth', '>=', date("Y-m-d", strtotime($input['dob_start'])));
-            })
-            ->when(!empty($input['dob_end']), static function ($q) use($input) {
-                $q->where('users.date_of_birth', '<=', date("Y-m-d", strtotime($input['dob_end'])));
-            })
-            ->when(!empty($input['application_date_start']), static function ($q) use($input) {
-                $q->where('users.created_at', '>=', date("Y-m-d", strtotime($input['application_date_start'])));
-            })
-            ->when(!empty($input['application_date_end']), static function ($q) use($input) {
-                $q->where('users.created_at', '<=', date("Y-m-d", strtotime($input['application_date_end'])));
-            })
-            ->when(!empty($input['selected']), static function ($q) use($input) {
-                if ($input['selected'] === 'selected') {
-                    $q->where('users.selected', 1);
-                }
-                $q->where('users.selected', 0);
-            })
-            ->when(!empty($input['cohort']), static function ($q) use($input) {
-                $q->where('users.cohort', $input['cohort']);
-            })
-            ->when(!empty($input['batch']), static function ($q) use($input) {
-                $q->where('users.batch', $input['batch']);
-            })
-            ->when(!empty($input['gender']), static function ($q) use($input) {
-                $q->where('users.gender', $input['gender']);
-            })
-            ->groupBy('users.id')
-            ->paginate(15);
+        dd(UserResource::collection($users)->response()->getData(true));
 
-        // if result exists return results, else return empty array
-        if($applications->total() > 0){
+        // if a result exists return results, else return empty array
+        if($users->total() > 0){
             return [
                 'success' => true,
-                'applications' => BraceApplicationSearchResource::collection($applications)->response()->getData(true),
-                'total' => $applications->total(),
-                'search_values' => Session::get('search_values')
+                'users' => UserResource::collection($users)->response()->getData(true),
+                'total' => $users->total(),
+                'search_values' => $searchResults
             ];
         }
 
         return [
             'success' => true,
-            'applications' => [],
+            'users' => [],
             'total' => 0,
-            'search_values' => Session::get('search_values')
+            'search_values' => $searchResults
         ];
     }
 }

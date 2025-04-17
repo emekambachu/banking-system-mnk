@@ -58,7 +58,7 @@ class AuthController extends Controller
     {
         try {
             $user = Auth::user()->load([
-                'account_number',
+                'account',
                 'roles',
             ]);
             return response()->json([

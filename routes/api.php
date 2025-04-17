@@ -9,10 +9,7 @@ use Illuminate\Support\Facades\Route;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 
-Route::group(['middleware' => [
-    'auth:sanctum',
-    'api'
-]], function () {
+Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/authenticate', [AuthController::class, 'authenticate']);
 
@@ -20,7 +17,7 @@ Route::group(['middleware' => [
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index']);
-        Route::get('/search', [UserController::class, 'search']);
+        Route::post('/users/search', [UserController::class, 'search']);
         Route::put('/users/{id}/update', [UserController::class, 'update']);
         Route::post('/users/create', [UserController::class, 'store']);
         Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);

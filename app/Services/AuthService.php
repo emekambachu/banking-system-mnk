@@ -43,7 +43,6 @@ class AuthService
             $user = Auth::user();
 
             if ($user) {
-                // Get Token
                 $request->session()->regenerate();
 
                 return [
@@ -89,7 +88,7 @@ class AuthService
                 $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
             }
 
-            $userData = $this->userRepository->getUserById($user->id, ['roles', 'account_number'], ['id']);
+            $userData = $this->userRepository->getUserById($user->id, ['roles', 'account'], ['id']);
 
             DB::commit();
 
