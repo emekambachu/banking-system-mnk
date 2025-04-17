@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BaseController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\UserFundsTransferController;
 use App\Http\Controllers\UserTransactionController;
@@ -14,7 +15,10 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
 
     Route::get('/authenticate', [AuthController::class, 'authenticate']);
 
+    Route::get('/currencies', [BaseController::class, 'currencies']);
+
     Route::get('/users/my-transactions', [UserTransactionController::class, 'myTransactions']);
+    Route::post('/users/send-funds/get-beneficiary', [UserFundsTransferController::class, 'getBeneficiary']);
     Route::post('/users/send-funds', [UserFundsTransferController::class, 'sendFunds']);
 
     Route::middleware(['admin'])->group(function () {

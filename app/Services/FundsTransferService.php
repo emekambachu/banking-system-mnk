@@ -28,9 +28,9 @@ class FundsTransferService
         $this->transactionRepository = $transactionRepository;
     }
 
-    public function sendFundsToUser($inputs, $sender){
-
-        Db::beginTransaction();
+    public function sendFundsToUser($inputs, $sender): array
+    {
+        DB::beginTransaction();
         try {
             $senderAccount = $this->accountNumberRepository->findByUserId($sender->id);
             if(!$senderAccount){
@@ -119,10 +119,13 @@ class FundsTransferService
             $receiverAccount->amount -= $inputs['amount'];
             $receiverAccount->save();
 
-
-
-
             DB::commit();
+
+            return [
+                'success' => true,
+                'message' => 'Funds transferred successfully',
+                'status' => 200
+            ];
 
         }catch (\Exception $exception){
             Log::error('Error sending funds: ' . $exception->getMessage());
@@ -133,6 +136,5 @@ class FundsTransferService
                 'status' => 500
             ];
         }
-
     }
 }
