@@ -62,4 +62,12 @@ class AccountNumberRepository
 
         return null;
     }
+
+    public function findByAccountNumber($accountNumber){
+        return $this->userAccountNumber->with('user')->where('account_number', $accountNumber)->first();
+    }
+
+    public function findByUserId($userId){
+        return $this->userAccountNumber->with('user')->where('user_id', $userId)->first();
+    }
 }

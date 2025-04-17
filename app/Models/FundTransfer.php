@@ -5,6 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class FundTransfer extends Model
@@ -29,7 +30,8 @@ class FundTransfer extends Model
         return $this->belongsTo(User::class, 'receiver_id', 'id');
     }
 
-    public function transaction(){
+    public function transaction(): HasOne
+    {
         return $this->hasOne(UserTransaction::class, 'fund_transfer_id', 'id');
     }
 }

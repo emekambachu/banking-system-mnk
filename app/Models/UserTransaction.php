@@ -12,6 +12,7 @@ class UserTransaction extends Model
     use HasFactory, SoftDeletes;
 
     protected $fillable = [
+        'hash',
         'user_id',
         'fund_transfer_id',
         'amount',

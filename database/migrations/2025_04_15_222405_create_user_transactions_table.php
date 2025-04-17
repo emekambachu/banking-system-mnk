@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('user_transactions', function (Blueprint $table) {
             $table->id();
+            $table->string('hash')->unique();
             $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
             $table->foreignId('fund_transfer_id')->nullable()->constrained()->onDelete('cascade');
             $table->float('amount')->index();

@@ -22,7 +22,7 @@ class UserAccountNumberFactory extends Factory
         return [
             'account_number' => generateUniqueRandomString(User::class, 'account_number', 10),
             'account_type' => 'savings',
-            'currency' => 'USD',
+            'currency' => $this->faker->randomElement(['EUR', 'USD', 'GBP']),
             'amount' => 10000.00,
         ];
     }
