@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Requests\StoreUsersRequest;
+use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Repositories\UserRepository;
 use App\Services\UserService;
@@ -25,7 +27,6 @@ class UserController extends Controller
     public function index(): JsonResponse
     {
         try{
-
             $users = $this->userRepository->getUsers(
                 ['id', 'first_name', 'last_name', 'mobile', 'email', 'address', 'created_at'],
                 ['account', 'roles']
@@ -61,4 +62,22 @@ class UserController extends Controller
             ], 500);
         }
     }
+
+    public function store(StoreUsersRequest $request): JsonResponse
+    {
+        try {
+            $response = $this->userService->storeUsers($request->all());
+            return response()->json($response, $response['status']);
+
+        }catch (\Exception $exception){
+
+            Log::error($exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ], 500);
+        }
+    }
+
+
 }

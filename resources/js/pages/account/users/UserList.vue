@@ -65,7 +65,13 @@ const getUsers = async (page = 1, type = 'get') => {
 };
 
 const updateUserList = (event) => {
-    users.value.unshift(event);
+    if (!Array.isArray(event)) {
+        handleErrors.hideErrorInProduction("Not an array", event);
+        return;
+    }
+    event.forEach((item) => {
+        users.value.unshift(item);
+    })
 }
 
 const deleteUser = (event) => {

@@ -33,7 +33,6 @@ class AuthController extends Controller
                 'success' => false,
                 'errors' => ['server_error' => ['Unexpected error occurred']],
             ], 500);
-
         }
     }
 

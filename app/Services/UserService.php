@@ -3,14 +3,30 @@
 namespace App\Services;
 
 use App\Http\Resources\UserResource;
+use App\Models\User;
+use App\Models\UserAccountNumber;
+use App\Repositories\AccountNumberRepository;
+use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Log;
+use Random\RandomException;
 
 class UserService
 {
     protected UserRepository $userRepository;
-    public function __construct(UserRepository $userRepository)
+    protected AccountNumberRepository $accountNumberRepository;
+    protected RoleRepository $roleRepository;
+    public function __construct(
+        UserRepository $userRepository,
+        AccountNumberRepository $accountNumberRepository,
+        RoleRepository $roleRepository
+    )
     {
+        $this->accountNumberRepository = $accountNumberRepository;
         $this->userRepository = $userRepository;
+        $this->roleRepository = $roleRepository;
     }
 
     public function search($inputs): array
@@ -79,5 +95,62 @@ class UserService
             'total' => 0,
             'search_values' => $searchResults
         ];
+    }
+
+    /**
+     */
+    public function storeUsers($inputs): array
+    {
+        $submittedUsers = [];
+        DB::beginTransaction();
+        try {
+            foreach($inputs as $input){
+                $input['password'] = Hash::make($input['password']);
+                $input['account_number'] = generateUniqueRandomString(
+                    UserAccountNumber::class,
+                    'account_number',
+                    10
+                );
+                $input['status'] = 1;
+                $user = $this->userRepository->storeUser($input);
+
+                if(!$user){
+                    DB::rollBack();
+                    return [
+                        'success' => false,
+                        'errors' => ['user' => ['User not created']],
+                        'status' => 422
+                    ];
+                }
+
+                $this->accountNumberRepository->createAccountNumberForUser($user);
+
+                $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
+
+                $newUser = new UserResource($user);
+                $submittedUsers[] = $newUser;
+            }
+
+            DB::commit();
+
+            return [
+                'success' => true,
+                'users' => $submittedUsers,
+                'message' => 'User Created Successfully',
+                'status' => 200,
+            ];
+
+        } catch (\Exception $e) {
+            Log::error('Error creating user: ' . $e->getMessage());
+            DB::rollBack();
+
+            return [
+                'success' => false,
+                'message' => 'Error creating user',
+                'users' => [],
+                'status' => 500,
+            ];
+        }
+
     }
 }
