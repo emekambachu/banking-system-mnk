@@ -11,16 +11,16 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('user_transactions', function (Blueprint $table) {
+        Schema::create('fund_transfers', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('user_id')->index()->constrained()->onDelete('cascade');
-            $table->foreignId('fund_transfer_id')->nullable()->constrained()->onDelete('cascade');
+            $table->foreignId('sender_id')->index()->constrained('users')->onDelete('cascade');
+            $table->foreignId('receiver_id')->index()->constrained('users')->onDelete('cascade');
             $table->float('amount')->index();
-            $table->enum('type', ['debit', 'credit']);
+            $table->string('currency');
             $table->string('description')->nullable();
             $table->softDeletes();
-            $table->timestamps();
             $table->engine('InnoDB');
+            $table->timestamps();
         });
     }
 
@@ -29,6 +29,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('user_transactions');
+        Schema::dropIfExists('fund_transfers');
     }
 };

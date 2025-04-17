@@ -88,9 +88,16 @@ onBeforeMount(() => {
                                 class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">
                                 Transactions
                             </RouterLink>
+
+                            <RouterLink
+                                :to="{ name:'funds-transfer' }"
+                                class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">
+                                Funds Transfer
+                            </RouterLink>
                         </div>
                     </div>
                 </div>
+
                 <div class="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
                     <button type="button" class="relative rounded-full bg-gray-800 p-1 text-gray-400 hover:text-white focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-800 focus:outline-hidden">
                         <span class="absolute -inset-1.5"></span>
@@ -122,6 +129,7 @@ onBeforeMount(() => {
 
                     </div>
                 </div>
+
             </div>
         </div>
 
@@ -147,6 +155,13 @@ onBeforeMount(() => {
                     class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">
                     Transactions
                 </RouterLink>
+
+                <RouterLink
+                    :to="{ name:'funds-transfer' }"
+                    class="block rounded-md bg-gray-900 px-3 py-2 text-base font-medium text-white" aria-current="page">
+                    Funds Transfer
+                </RouterLink>
+
             </div>
         </div>
 

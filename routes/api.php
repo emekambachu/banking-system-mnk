@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
+use App\Http\Controllers\UserFundsTransferController;
 use App\Http\Controllers\UserTransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -14,6 +15,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
     Route::get('/authenticate', [AuthController::class, 'authenticate']);
 
     Route::get('/users/my-transactions', [UserTransactionController::class, 'myTransactions']);
+    Route::post('/users/send-funds', [UserFundsTransferController::class, 'sendFunds']);
 
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index']);
