@@ -1,5 +1,5 @@
 <script setup>
-import {handleError, onBeforeMount, ref} from "vue";
+import {handleError, onBeforeMount, provide, ref} from "vue";
 import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
 
@@ -29,6 +29,9 @@ const authenticateUser = async () => {
         window.location.href = '/login';
     }
 };
+
+// Provide the `user` data to child components
+provide('authUser', user);
 
 onBeforeMount(() => {
     authenticateUser();
@@ -149,8 +152,7 @@ onBeforeMount(() => {
 
     </nav>
 
-    <router-view>
-    </router-view>
+    <router-view></router-view>
 
 </template>
 

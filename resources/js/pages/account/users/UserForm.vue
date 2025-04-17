@@ -39,6 +39,7 @@ const submitForm = async () => {
 
             submitted.value = true;
             errors.value = {};
+
             formGroups = [{
                 first_name: '',
                 last_name: '',
@@ -213,11 +214,14 @@ onBeforeMount(() => {});
                 </p>
             </div>
 
-            <p v-if="submitted" class="font-bold bg-emerald-500 text-amber-50 p-1 rounded-b-md text-center">
+            <p v-if="submitted" class="font-bold bg-emerald-500 text-amber-50 p-1 rounded-b-md text-center mb-2">
                 Created successfully
             </p>
 
-            <button v-if="!loading" type="submit" class="text-blue-500 text-sm border border-blue-500 dark:text-white rounded-lg px-2 py-1 bg-blue-500 w-1/2">
+            <button
+                v-if="!loading"
+                type="submit"
+                class="text-blue-500 text-sm border border-blue-500 dark:text-white rounded-lg px-2 py-1 bg-blue-500 w-1/2">
                 Submit
             </button>
 
