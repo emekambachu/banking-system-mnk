@@ -23,7 +23,7 @@ const props = defineProps({
 });
 const authUser = ref(props.auth_user);
 const myTransactions = computed(() => {
-    return window.location.href === '/account/my-transactions';
+    return window.location.href === 'account/my-transactions';
 });
 
 const transactions = ref([]);
@@ -40,7 +40,7 @@ const getTransactions = async (page = 1) => {
 
     try {
         let response;
-        if(myTransactions.value) {
+        if(myTransactions) {
             response = await apiClient.get('/users/my-transactions?page=' + page);
         } else {
             response = await apiClient.get('/users/' + id.value + '/transactions?page=' + page);
@@ -51,6 +51,8 @@ const getTransactions = async (page = 1) => {
             pagination.value.links = response.data.transactions.links;
             pagination.value.meta = response.data.transactions.meta;
             total.value = response.data.total;
+
+            console.log("Transactions", response.data);
         }
 
     } catch (error) {

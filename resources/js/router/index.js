@@ -89,11 +89,11 @@ const authenticateUser = async () => {
             return true;
         } else {
             handleErrors.hideErrorInProduction('Un-authorized', response.data);
-            await router.push('/login');
+            return false;
         }
     } catch (error) {
         handleErrors.hideErrorInProduction('Auth Error', error.response);
-        await router.push('/login');
+        return false;
     }
 };
 

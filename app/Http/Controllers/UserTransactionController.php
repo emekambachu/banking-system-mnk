@@ -51,6 +51,7 @@ class UserTransactionController extends Controller
             return response()->json([
                 'success' => true,
                 'transactions' => TransactionResource::collection($transactions)->response()->getData(true),
+                'total' => $transactions->total(),
             ]);
 
         }catch (\Exception $exception){
