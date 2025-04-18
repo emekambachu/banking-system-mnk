@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Http\Requests\UserRegisterRequest;
 use App\Http\Resources\UserResource;
 use App\Services\AuthService;
+use App\Services\TwoFactorAuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,11 +14,14 @@ use Illuminate\Support\Facades\Log;
 class AuthController extends Controller
 {
     protected AuthService $authService;
+    protected TwoFactorAuthService $twoFactorAuthService;
     public function __construct(
-        AuthService $authService
+        AuthService $authService,
+        TwoFactorAuthService $twoFactorAuthService
     )
     {
         $this->authService = $authService;
+        $this->twoFactorAuthService = $twoFactorAuthService;
     }
 
     public function register(UserRegisterRequest $request): JsonResponse
@@ -93,4 +97,21 @@ class AuthController extends Controller
 
         }
     }
+
+    public function verifyTwoFactorCode(Request $request): JsonResponse
+    {
+        try {
+            $response = $this->twoFactorAuthService->verify2FA($request->secret);
+            return response()->json($response, $response['status']);
+
+        }catch (\Exception $exception){
+            Log::error($exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ], 500);
+
+        }
+    }
+
 }

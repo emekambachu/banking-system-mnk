@@ -66,4 +66,14 @@ class User extends Authenticatable
     {
         return $this->belongsToMany(Role::class, 'user_roles', 'user_id', 'role_id');
     }
+
+    public function transactions(): HasMany
+    {
+        return $this->hasMany(UserTransaction::class, 'user_id', 'id');
+    }
+
+    public function twoFactorAuth(): HasOne
+    {
+        return $this->hasOne(TwoFactorAuth::class, 'user_id', 'id');
+    }
 }

@@ -15,7 +15,8 @@ return new class extends Migration
             $table->id();
             $table->foreignId('user_id')->constrained()->onDelete('cascade');
             $table->string('secret')->nullable();
-            $table->timestamp('expires_at')->nullable();
+            $table->timestamp('secret_expires_at')->nullable();
+            $table->timestamp('secret_verified_at')->nullable();
             $table->boolean('enabled')->default(false);
             $table->timestamps();
         });

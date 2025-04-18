@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
+Route::post('/login/2fa-verify', [AuthController::class, 'verifyTwoFactorCode']);
 
 Route::group(['middleware' => 'auth:sanctum'], function () {
 

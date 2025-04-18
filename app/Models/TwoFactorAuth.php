@@ -13,7 +13,8 @@ class TwoFactorAuth extends Model
     protected $fillable = [
         'user_id',
         'secret',
-        'expired_at',
+        'secret_expires_at',
+        'secret_verified_at',
         'enabled',
     ];
 

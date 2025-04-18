@@ -35,7 +35,7 @@ class TwoFactorAuthRepository
 
         $newSecret = $this->twoFactorAuth->where('user_id', $user->id)->update([
             'secret' => $secret,
-            'expires_at' => $expires_at,
+            'secret_expires_at' => $expires_at,
             'enabled' => true,
         ]);
 
@@ -47,12 +47,15 @@ class TwoFactorAuthRepository
         $verified = $this->twoFactorAuth->with('user')->where([
             ['secret', $secret],
             ['enabled', true],
-            ['expires_at', '>', Carbon::now()],
-        ])->exists();
+            ['secret_expires_at', '>=', Carbon::now()],
+        ])->first();
 
         if ($verified) {
+            $verified->secret_verified_at = Carbon::now();
+            $verified->save();
             return true;
         }
+
         return false;
     }
 }

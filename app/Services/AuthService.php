@@ -3,46 +3,68 @@
 namespace App\Services;
 
 use App\Http\Resources\UserResource;
-use App\Models\User;
 use App\Repositories\AccountNumberRepository;
 use App\Repositories\RoleRepository;
 use App\Repositories\UserRepository;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Collection;
-use Illuminate\Database\Eloquent\Model;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Random\RandomException;
-use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
-use Laravel\Sanctum\PersonalAccessToken;
+use Random\RandomException;
 
 class AuthService
 {
     protected UserRepository $userRepository;
     protected AccountNumberRepository $accountNumberRepository;
     protected RoleRepository $roleRepository;
+    protected TwoFactorAuthService $twoFactorAuthService;
     public function __construct(
         UserRepository $userRepository,
         AccountNumberRepository $accountNumberRepository,
-        RoleRepository $roleRepository
+        RoleRepository $roleRepository,
+        TwoFactorAuthService $twoFactorAuthService
     )
     {
         $this->accountNumberRepository = $accountNumberRepository;
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
+        $this->twoFactorAuthService = $twoFactorAuthService;
     }
 
+    /**
+     * @throws RandomException
+     */
     public function login(
         $request,
     ): array
     {
         $credentials = $request->only('email', 'password');
         if (Auth::attempt($credentials)) {
-            $user = Auth::user();
+            $user = Auth::user()->load('twoFactorAuth');
+
+            // Check if the user has 2FA enabled
+            if ($user->twoFactorAuth && $user->twoFactorAuth->enabled) {
+                try {
+                    // Generate a new 2FA code and send it to the user
+                    $this->twoFactorAuthService->process2FA($user);
+                    return [
+                        'success' => true,
+                        'two_factor_auth' => true,
+                        'status' => 200,
+                        'message' => 'Two Factor Authentication code sent to your email.'
+                    ];
+
+                }catch (\Exception $e){
+                    Log::error('Error sending 2FA code: ' . $e->getMessage());
+                    return [
+                        'success' => false,
+                        'errors' => ['access' => ['Error sending 2FA code, try again later.']],
+                        'status' => 500
+                    ];
+                }
+            }
 
             if ($user) {
                 $request->session()->regenerate();
