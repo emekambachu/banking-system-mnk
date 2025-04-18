@@ -55,15 +55,23 @@ const formValidations = {
         }
     },
 
-    validateFileType(file, allowedExtensions = []) {
-        const fileName = file.name;
-        const fileExtension = fileName.split('.').pop().toLowerCase();
-        return allowedExtensions.includes(fileExtension);
-    },
+    validateAmount(amount, min = null, max = null){
+        if(amount !== "" && amount !== null){
 
-    validateFileSize(file, maxSize) {
-        return file.size <= maxSize;
-    },
+            // amount must be a positive number
+            if (!isNaN(amount) && amount > 0) {
+                return amount;
+            }
+
+            if(min !== null && max !== null){
+                return amount >= min && amount <= max;
+            }else if(min !== null){
+                return amount >= min;
+            }else if(max !== null){
+                return amount <= max;
+            }
+        }
+    }
 
 }
 

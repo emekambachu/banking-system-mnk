@@ -40,17 +40,24 @@ class UserFundsTransferController extends Controller
     public function getBeneficiary(Request $request): JsonResponse
     {
         try {
-            $user = $this->accountNumberRepository->findByAccountNumber($request->account_number);
-            if(!$user){
+            $account = $this->accountNumberRepository->findByAccountNumber($request->account_number);
+
+            if(!$account){
                 return response()->json([
                     'success' => false,
-                    'errors' => ['account' => ['User Not Found']],
+                    'errors' => ['account' => ['Beneficiary Not Found']],
                     'status' => 422
                 ]);
             }
             return response()->json([
                 'success' => true,
-                'beneficiary' => $user,
+                'beneficiary' => [
+                    'id' => $account->user->id,
+                    'first_name' => $account->user->first_name,
+                    'last_name' => $account->user->last_name,
+                    'account_number' => $account->account_number,
+                    'currency' => $account->currency,
+                ],
             ]);
 
         } catch (\Exception $e) {

@@ -31,7 +31,7 @@ const authenticateUser = async () => {
 };
 
 // Provide the `user` data to child components
-provide('authUser', user);
+// provide('authUser', user);
 
 onBeforeMount(() => {
     authenticateUser();

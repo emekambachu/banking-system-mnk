@@ -12,8 +12,10 @@ class CurrencyConversionRepository
     private mixed $accessKey;
     private Client $client;
     public function __construct(){
-        $this->accessKey = env('EXCHANGERATES_API_KEY');
-        $this->client = new Client();
+        $this->accessKey = config('services.exchange_rates.key');
+        $this->client = new Client([
+            'verify' => false
+        ]);
     }
 
     private function getApiUrl($endpoint, $params = []): string
