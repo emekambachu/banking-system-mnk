@@ -1,5 +1,5 @@
 <script setup>
-import {handleError, onBeforeMount, provide, ref} from "vue";
+import {handleError, onBeforeMount, onMounted, provide, ref, toRefs} from "vue";
 import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
 
@@ -21,6 +21,7 @@ const authenticateUser = async () => {
         const response = await apiClient.get('/authenticate');
         if(response.data.success){
             user.value = response.data.user;
+            console.log("User Authenticated", user.value);
         } else {
             window.location.href = '/login';
         }
@@ -30,8 +31,7 @@ const authenticateUser = async () => {
     }
 };
 
-// Provide the `user` data to child components
-// provide('authUser', user);
+
 
 onBeforeMount(() => {
     authenticateUser();
@@ -167,7 +167,12 @@ onBeforeMount(() => {
 
     </nav>
 
-    <router-view></router-view>
+    <!--Load component only if user auth hsd been downloaded-->
+    <div v-if="user">
+        <router-view v-slot="{ Component }">
+            <component :is="Component" :auth_user="user" />
+        </router-view>
+    </div>
 
 </template>
 

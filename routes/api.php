@@ -28,7 +28,7 @@ Route::group(['middleware' => 'auth:sanctum'], function () {
         Route::post('/users/create', [UserController::class, 'store']);
         Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);
 
-        Route::get('/users/{id}/transactions', [UserTransactionController::class, 'show']);
+        Route::get('/users/{id}/transactions', [UserTransactionController::class, 'transactions']);
     });
 
 });

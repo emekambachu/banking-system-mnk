@@ -48,11 +48,13 @@ const router = createRouter({
                     path: 'my-transactions',
                     name: 'my-transactions',
                     component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
+                    props: true
                 },
                 {
                     path: 'transactions/:id',
                     name: 'transactions',
                     component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
+                    props: true
                 },
                 {
                     path: 'funds-transfer',

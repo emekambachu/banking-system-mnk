@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TransactionRepository
 {
-    private $transaction;
+    private UserTransaction $transaction;
     public function __construct(){
         $this->transaction = new UserTransaction();
     }

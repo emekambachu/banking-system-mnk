@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted, watch, inject} from 'vue';
+import {ref, onMounted, watch, inject, toRef, onBeforeMount, computed} from 'vue';
 import TransactionListItem from "@/js/pages/account/transactions/TransactionListItem.vue";
 import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
@@ -17,8 +17,14 @@ watch(
     },
 );
 
-// Get user data from parent component layout
-const authUser = inject('authUser'); // Access the provided `user` data
+// Get user from parent component, AccountLayout.vue
+const props = defineProps({
+    auth_user: { type: Object, required: true }
+});
+const authUser = ref(props.auth_user);
+const myTransactions = computed(() => {
+    return window.location.href === '/account/my-transactions';
+});
 
 const transactions = ref([]);
 const total = ref(0);
@@ -28,19 +34,15 @@ const pagination = ref({
 });
 const loading = ref(false);
 
-const searchValues = ref([]);
-
-const getTransactions = async (page = 1, type = 'my-transactions') => {
+const getTransactions = async (page = 1) => {
     loading.value = true;
     transactions.value = [];
 
     try {
         let response;
-        if(type === 'my-transactions') {
+        if(myTransactions.value) {
             response = await apiClient.get('/users/my-transactions?page=' + page);
-        }
-
-        if(type === 'user-transactions') {
+        } else {
             response = await apiClient.get('/users/' + id.value + '/transactions?page=' + page);
         }
 
@@ -62,7 +64,8 @@ const getTransactions = async (page = 1, type = 'my-transactions') => {
     loading.value = false;
 };
 
-onMounted(() => {
+onBeforeMount(() => {
+    console.log("beforeMount", authUser.value);
     getTransactions();
 });
 
@@ -70,10 +73,10 @@ onMounted(() => {
 
 <template>
     <div>
-        <h1 class="text-3xl mb-2">Transactions</h1>
+        <h3 class="text-2xl mb-2">Transactions ({{ total }})</h3>
     </div>
 
-    <div class="relative overflow-x-auto">
+    <div class="relative">
         <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
 
             <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
@@ -98,11 +101,17 @@ onMounted(() => {
 
             <tbody>
             <TransactionListItem
+                v-if="total > 0"
                 v-for="(transaction, index) in transactions"
                 :key="transaction.id"
                 :index="index"
                 :transaction="transaction"
             />
+            <tr v-else>
+                <td colspan="5" class="text-center py-4">
+                    <p class="text-gray-500">No transactions found</p>
+                </td>
+            </tr>
             </tbody>
         </table>
 

@@ -18,10 +18,11 @@ class TransactionResource extends JsonResource
             'hash' => $this->hash,
             'id' => $this->id,
             'user_id' => $this->user_id,
-            'amount' => $this->amount,
+            'amount' => $this->currency.' '.$this->amount,
+            'currency' => $this->fundTransfer->currency,
             'type' => $this->type,
             'description' => $this->description,
-            'created_at' => $this->created_at,
+            'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }
 }
