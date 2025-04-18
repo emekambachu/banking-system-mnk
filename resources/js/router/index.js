@@ -89,11 +89,11 @@ const authenticateUser = async () => {
             return true;
         } else {
             handleErrors.hideErrorInProduction('Un-authorized', response.data);
-            window.location.href = '/login';
+            await router.push('/login');
         }
     } catch (error) {
         handleErrors.hideErrorInProduction('Auth Error', error.response);
-        window.location.href = '/login';
+        await router.push('/login');
     }
 };
 
@@ -101,7 +101,10 @@ const authenticateUser = async () => {
 router.beforeEach(async (to, from, next) => {
     try {
         if (to.meta.requiresAuth) {
-            await authenticateUser();
+            const isAuthenticated = await authenticateUser();
+            if (!isAuthenticated || user === null) {
+                return next({ name: 'login' });
+            }
             if (to.meta.requiresAdmin && !user?.roles?.includes('admin')) {
                 return next({ name: 'unauthorized' });
             }
@@ -113,7 +116,7 @@ router.beforeEach(async (to, from, next) => {
         });
         next();
     } catch (err) {
-        window.location.href = '/login';
+        return next({ name: 'login' });
     }
 });
 

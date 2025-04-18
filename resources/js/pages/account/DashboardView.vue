@@ -6,6 +6,12 @@
     <div class="grid grid-cols-1 gap-4">
         <div class="bg-white py-24 sm:py-32">
             <div class="mx-auto max-w-7xl px-6 lg:px-8">
+
+              <div class="mx-auto mb-5 text-center">
+                  <h1>Welcome to your dashboard</h1>
+                  <p>Navigate pages in the menu</p>
+              </div>
+
                 <dl class="grid grid-cols-1 gap-x-8 gap-y-16 text-center lg:grid-cols-3">
                     <div class="mx-auto flex max-w-xs flex-col gap-y-4">
                         <dt class="text-base/7 text-gray-600">Transactions every 24 hours</dt>

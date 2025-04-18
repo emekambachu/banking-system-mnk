@@ -74,4 +74,23 @@ class AuthController extends Controller
 
         }
     }
+
+    public function logout(Request $request): JsonResponse
+    {
+        try {
+            $this->authService->logout($request);
+            return response()->json([
+                'success' => true,
+                'message' => 'Logged out successfully',
+            ]);
+
+        }catch (\Exception $exception){
+            Log::error($exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ], 500);
+
+        }
+    }
 }

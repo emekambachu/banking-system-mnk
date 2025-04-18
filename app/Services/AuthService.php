@@ -10,6 +10,8 @@ use App\Repositories\UserRepository;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Cookie;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
@@ -66,9 +68,21 @@ class AuthService
         ];
     }
 
-    public function logout()
+    public function logout($request): JsonResponse
     {
-        // Logic for user logout
+        // 1) Log out the user from the session guard
+        Auth::logout();
+
+        // 2) Invalidate & regenerate session/CSRF
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
+
+        // 3) Forget the session cookie on the client
+        $cookieName = config('session.cookie'); // typically 'laravel_session'
+        $forget = Cookie::forget($cookieName);
+
+        return response()->json(['message' => 'Logged out'])
+            ->withCookie($forget);
     }
 
     public function register($userData): array

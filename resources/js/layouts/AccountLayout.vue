@@ -2,6 +2,8 @@
 import {onBeforeMount, ref} from "vue";
 import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
+import axios from "axios";
+import router from "@/js/router/index.js";
 
 const showMobileMenu = ref(false);
 const showProfileDropDown = ref(false);
@@ -22,11 +24,22 @@ const authenticateUser = async () => {
         if(response.data.success){
             user.value = response.data.user;
         } else {
+            await router.push('/login');
+        }
+    } catch (error) {
+        handleErrors.hideErrorInProduction('Auth Error', error.response);
+        await router.push('/login');
+    }
+};
+
+const logout = async () => {
+    try {
+        const response = await axios.get('/logout');
+        if(response.data.success){
             window.location.href = '/login';
         }
     } catch (error) {
         handleErrors.hideErrorInProduction('Auth Error', error.response);
-        window.location.href = '/login';
     }
 };
 
@@ -77,7 +90,7 @@ onBeforeMount(() => {
                             </RouterLink>
 
                             <RouterLink
-                                v-if="user.roles?.includes('admin')"
+                                v-if="user?.roles?.includes('admin')"
                                 :to="{ name:'users' }"
                                 class="rounded-md bg-gray-900 px-3 py-2 text-sm font-medium text-white" aria-current="page">
                                 Users
@@ -123,8 +136,16 @@ onBeforeMount(() => {
                             <!-- Active: "bg-gray-100 outline-hidden", Not Active: "" -->
                             <a href="#" class="block px-4 py-2 text-sm text-gray-700 font-extrabold border-b-black" role="menuitem" tabindex="-1" id="user-menu-item-0">{{ user.first_name+' '+user.last_name }}</a>
                             <hr/>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-1">Settings</a>
-                            <a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1" id="user-menu-item-2">Sign out</a>
+
+                            <a
+                                @click.prevent="logout"
+                                href="#"
+                                class="block px-4 py-2 text-sm text-gray-700"
+                                role="menuitem"
+                                tabindex="-1"
+                                id="user-menu-item-2">
+                                Sign out
+                            </a>
                         </div>
 
                     </div>
