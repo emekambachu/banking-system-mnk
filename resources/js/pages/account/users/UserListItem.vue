@@ -20,7 +20,11 @@ const props = defineProps({
   index: {
     type: Number,
     required: true
-  }
+  },
+    auth_user: {
+        type: Object,
+        required: true
+    }
 });
 
 const user = ref(props.user);
@@ -43,10 +47,6 @@ const deleteUser = async () => {
 
   loading.value = false;
 }
-
-onMounted(() => {
-
-});
 
 </script>
 
@@ -83,6 +83,7 @@ onMounted(() => {
         <td class="px-6 py-4">
             <div class="flex">
                 <router-link
+                    v-if="auth_user.roles.includes('admin')"
                     :to="{ name: 'transactions', params: { id: user.id } }">
                     <button class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mr-2 rounded">
                         Transactions

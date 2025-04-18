@@ -47,13 +47,10 @@ const getTransactions = async (page = 1) => {
         }
 
         if(response.data.success){
-            console.log("Get Users", response.data.transactions);
             transactions.value = response.data.transactions.data;
             pagination.value.links = response.data.transactions.links;
             pagination.value.meta = response.data.transactions.meta;
             total.value = response.data.total;
-
-            console.log(response.data.transactions);
         }
 
     } catch (error) {
@@ -65,7 +62,6 @@ const getTransactions = async (page = 1) => {
 };
 
 onBeforeMount(() => {
-    console.log("beforeMount", authUser.value);
     getTransactions();
 });
 

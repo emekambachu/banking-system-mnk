@@ -6,6 +6,8 @@ import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
 import axios from 'axios';
 
+let user = null;
+
 const router = createRouter({
     history: createWebHistory(),
     routes: [
@@ -43,6 +45,8 @@ const router = createRouter({
                     path: 'users',
                     name: 'users',
                     component: () => import('@/js/pages/account/users/UserList.vue'),
+                    props: true,
+                    meta: { requiresAdmin: true },
                 },
                 {
                     path: 'my-transactions',
@@ -54,12 +58,19 @@ const router = createRouter({
                     path: 'transactions/:id',
                     name: 'transactions',
                     component: () => import('@/js/pages/account/transactions/TransactionList.vue'),
-                    props: true
+                    props: true,
+                    meta: { requiresAdmin: true },
                 },
                 {
                     path: 'funds-transfer',
                     name: 'funds-transfer',
                     component: () => import('@/js/pages/account/funds-transfer/FundsTransferView.vue'),
+                },
+
+                {
+                    path: 'un-authorized',
+                    name: 'unauthorized',
+                    component: () => import('@/js/pages/account/UnauthorizedView.vue'),
                 },
 
             ],
@@ -74,6 +85,7 @@ const authenticateUser = async () => {
         await axios.get(`/sanctum/csrf-cookie`);
         const response = await apiClient.get('/authenticate');
         if(response.data.success){
+            user = response.data.user;
             return true;
         } else {
             handleErrors.hideErrorInProduction('Un-authorized', response.data);
@@ -87,26 +99,22 @@ const authenticateUser = async () => {
 
 // Global navigation guard
 router.beforeEach(async (to, from, next) => {
-    if (to.meta.requiresAuth) {
-        try {
+    try {
+        if (to.meta.requiresAuth) {
             await authenticateUser();
-            next();
-        } catch (err) {
-            // Redirect to the login page if not authenticated
-            window.location.href = '/login';
+            if (to.meta.requiresAdmin && !user?.roles?.includes('admin')) {
+                return next({ name: 'unauthorized' });
+            }
         }
-    } else {
+        // Scroll to top on route change
+        window.scrollTo({
+            top: 0,
+            behavior: 'smooth',
+        });
         next();
+    } catch (err) {
+        window.location.href = '/login';
     }
 });
-
-router.beforeEach((to, from, next) => {
-    // scroll to top on route change
-    window.scrollTo({
-        top: 0,
-        behavior: 'smooth',
-    })
-    next()
-})
 
 export default router

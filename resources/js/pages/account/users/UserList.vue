@@ -7,6 +7,12 @@ import SlideOverModal from "@/js/components/Modals/SlideOverModal.vue";
 import UserForm from "@/js/pages/account/users/UserForm.vue";
 import NumberPagination from "@/js/components/paginations/NumberPagination.vue";
 
+// Get user from parent component, AccountLayout.vue
+const props = defineProps({
+    auth_user: { type: Object, required: true }
+});
+const authUser = ref(props.auth_user);
+
 const users = ref([]);
 const total = ref(0);
 const pagination = ref({
@@ -42,12 +48,10 @@ const getUsers = async (page = 1, type = 'get') => {
         }
 
         if(response.data.success){
-            console.log("Get Users", response.data.users);
             users.value = response.data.users.data;
             pagination.value.links = response.data.users.links;
             pagination.value.meta = response.data.users.meta;
             total.value = response.data.total;
-            console.log(response.data.users);
 
             if(type === 'search') {
                 searchValues.value = response.data.search_values;
@@ -189,6 +193,7 @@ onMounted(() => {
                     :key="user.id"
                     :index="index"
                     :user="user"
+                    :auth_user="auth_user"
                     @delete-user="deleteUser"
                 />
             </tbody>
