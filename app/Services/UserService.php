@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Resources\UserResource;
+use App\Http\Resources\UserSearchResource;
 use App\Models\User;
 use App\Models\UserAccountNumber;
 use App\Repositories\AccountNumberRepository;
@@ -52,9 +53,8 @@ class UserService
 
         $users = $this->userRepository->getUsers(
             ['users.*','users.id AS user_id', 'user_account_numbers.*', 'user_account_numbers.id AS account_number_id'],
-            ['account', 'roles']
-
-        )->leftjoin('user_account_numbers', 'user_account_numbers.user_id', '=', 'users.id')
+            ['roles']
+        )->leftJoin('user_account_numbers', 'user_account_numbers.user_id', '=', 'users.id')
             ->where(function($query) use ($inputs){
                 $query->when(!empty($inputs['search_value']), static function($q) use($inputs){
                     $q->where('users.first_name', 'like' , '%'. $inputs['search_value'] .'%')
@@ -68,7 +68,7 @@ class UserService
                     $query->where('user_account_numbers.amount', '>=', $inputs['balance_greater_than']);
 
                 })->when(!empty($inputs['balance_less_than']), static function ($query) use($inputs){
-                    $query->where('user_account_numbers.amount', '>=', $inputs['balance_less_than']);
+                    $query->where('user_account_numbers.amount', '<=', $inputs['balance_less_than']);
 
                 })->when(!empty($inputs['date_joined_before']), static function ($query) use($inputs){
                     $query->where('users.created_at', '>=', $inputs['date_joined_before']);
@@ -83,7 +83,7 @@ class UserService
         if($users->total() > 0){
             return [
                 'success' => true,
-                'users' => UserResource::collection($users)->response()->getData(true),
+                'users' => UserSearchResource::collection($users)->response()->getData(true),
                 'total' => $users->total(),
                 'search_values' => $searchResults
             ];
