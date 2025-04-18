@@ -3,6 +3,7 @@
 namespace Database\Seeders;
 
 use App\Models\Role;
+use App\Models\TwoFactorAuth;
 use App\Models\User;
 use App\Models\UserAccountNumber;
 use App\Models\UserRole;
@@ -71,6 +72,10 @@ class UserSeeder extends Seeder
             UserRole::create([
                 'user_id' => $user->id,
                 'role_id' => 2, // Assuming 2 is the ID for the user role
+            ]);
+
+            TwoFactorAuth::factory()->create([
+                'user_id' => $user->id
             ]);
         });
 
