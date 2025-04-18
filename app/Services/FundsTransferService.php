@@ -52,6 +52,7 @@ class FundsTransferService
             // get Receiver Id with account number
             $receiverAccount = $this->accountNumberRepository->findByAccountNumber($inputs['account_number']);
             if(!$receiverAccount){
+                Log::error('Receiver account not found: ' . $inputs['account_number']);
                 return [
                     'success' => false,
                     'errors' => ['account' => ['Account number not found']],
@@ -61,12 +62,12 @@ class FundsTransferService
 
             // Convert currency with API
             $convertedCurrency = $this->currencyConversionRepository->convertCurrency(
-                $inputs['from_currency'],
-                $inputs['to_currency'],
+                $senderAccount->currency,
+                $inputs['currency'],
                 $inputs['amount'],
             );
             if(!$convertedCurrency['success']){
-                DB::rollBack();
+                Log::error('Currency conversion failed: ' . $convertedCurrency['error']);
                 return [
                     'success' => false,
                     'errors' => ['currency' => ['Currency conversion failed']],
@@ -98,7 +99,8 @@ class FundsTransferService
                 'user_id' => $sender->id,
                 'fund_transfer_id' => $transferredFunds->id,
                 'amount' => $inputs['amount'],
-                'currency' => $inputs['from_currency'],
+                'currency' => $sender->currency,
+                'type' => 'debit',
                 'description' => $inputs['description'],
             ]);
 
@@ -108,6 +110,7 @@ class FundsTransferService
                 'fund_transfer_id' => $transferredFunds->id,
                 'amount' => $convertedCurrency['amount'],
                 'currency' => $convertedCurrency['to_currency'],
+                'type' => 'credit',
                 'description' => $inputs['description'],
             ]);
 

@@ -1,5 +1,5 @@
 <script setup>
-import {ref, onMounted, watch, inject, reactive} from 'vue';
+import {ref, onMounted, reactive, computed} from 'vue';
 import apiClient from "@/js/utils/apiClient.js";
 import handleErrors from "@/js/utils/handleErrors.js";
 import AnimateSpinIcon from "@/js/components/Icons/AnimateSpinIcon.vue";
@@ -13,14 +13,15 @@ const loading = ref({
 const submitted = ref(false);
 const currencies = ref([]);
 const beneficiary = ref('');
-const previewConvertedAmount = ref('');
+const previewConvertedAmount = ref({
+    amount: 0.00,
+    currency: '',
+});
 const errors = ref({});
 
 const forms = reactive({
-    account: {
-        account_number: ''
-    },
     fund_transfer: {
+        account_number: '',
         receiver_id: null,
         amount: 0.00,
         currency: '',
@@ -29,9 +30,18 @@ const forms = reactive({
 });
 
 const sendFunds = async () => {
+    submitted.value = false;
     loading.value.fund_transfer = true;
     try {
-        let response = await apiClient.post('/users/send-funds');
+        let formInputs = {
+            account_number: forms.fund_transfer.account_number,
+            receiver_id: forms.fund_transfer.receiver_id,
+            amount: forms.fund_transfer.amount,
+            currency: forms.fund_transfer.currency.currency,
+            description: forms.fund_transfer.description,
+        };
+
+        let response = await apiClient.post('/users/send-funds', formInputs);
 
         if(response.data.success){
             submitted.value = true;
@@ -39,6 +49,9 @@ const sendFunds = async () => {
         }
 
     } catch (error) {
+        if(error.response.data.errors){
+            errors.value = error.response.data.errors;
+        }
         if (error.response){
             handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response)
         }
@@ -53,9 +66,14 @@ const getCurrencies = async () => {
         if(response.data.success){
             currencies.value = response.data.currencies;
             console.log("Currencies", currencies.value);
+        }else{
+            errors.value = response.data.errors;
         }
 
     } catch (error) {
+        if(error.response.data.errors){
+            errors.value = error.response.data.errors;
+        }
         if (error.response) {
             handleErrors.hideErrorInProduction("ERROR_RESPONSE", error.response)
         }
@@ -65,8 +83,11 @@ const getCurrencies = async () => {
 const getBeneficiary = async () => {
     loading.value.beneficiary = true;
     try {
-        console.log("FORMS Account NUMBER", forms.account);
-        let response = await apiClient.post('/users/send-funds/get-beneficiary', forms.account);
+        let formInputs = {
+            account_number: forms.fund_transfer.account_number,
+        };
+        console.log("FORMS Account NUMBER", formInputs);
+        let response = await apiClient.post('/users/send-funds/get-beneficiary', formInputs);
         if(response.data.success){
             beneficiary.value = response.data.beneficiary;
             forms.fund_transfer.receiver_id = response.data.beneficiary.id;
@@ -90,13 +111,17 @@ const getBeneficiary = async () => {
 
 const previewConversion = () => {
 
+    submitted.value = false;
+
     if(!forms.fund_transfer.amount){
-        previewConvertedAmount.value = '';
+        previewConvertedAmount.value.amount = 0.00;
     }
 
     if(forms.fund_transfer.amount && forms.fund_transfer.currency) {
         let amount = forms.fund_transfer.amount;
-        let currency = forms.fund_transfer.currency.value;
+        let currency = forms.fund_transfer.currency.rate;
+
+        previewConvertedAmount.value.currency = forms.fund_transfer.currency.currency;
 
         // validate amount to prevent NaN, undefined, null, -0, etc
         let valid = formValidations.validateAmount(forms.fund_transfer.amount);
@@ -105,14 +130,24 @@ const previewConversion = () => {
                 amount: ['Invalid amount']
             }
             forms.fund_transfer.amount = '';
-            previewConvertedAmount.value = ''
+            previewConvertedAmount.value.amount = 0.00
             return;
         }else{
             errors.value = {};
         }
 
-        previewConvertedAmount.value = (amount * currency).toFixed(2);
-        console.log("Preview Converted Amount", previewConvertedAmount.value);
+        // maximum of 10 million
+        if(amount > 1000000){
+            errors.value = {
+                amount: ['Amount too large']
+            }
+            forms.fund_transfer.amount = '';
+            previewConvertedAmount.value.amount = 0.00
+            return;
+        }
+
+        previewConvertedAmount.value.amount = (amount * currency).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        console.log("Preview Converted Amount", previewConvertedAmount.value.amount);
     }
 }
 
@@ -144,9 +179,9 @@ onMounted(() => {
                         <p v-if="beneficiary">
                             <span class="font-bold">Account Name: </span> {{ beneficiary.first_name + " " + beneficiary.last_name }}
                         </p>
-                        <p v-if="previewConvertedAmount">
+                        <p v-if="previewConvertedAmount.amount">
                             <span class="font-bold">Beneficiary will receive:</span>
-                            {{ previewConvertedAmount }}<br>
+                            {{ previewConvertedAmount.currency+' '+previewConvertedAmount.amount }}<br>
                         </p>
                     </div>
 
@@ -154,7 +189,7 @@ onMounted(() => {
                         Beneficiary Account Number
                     </label>
                     <input
-                        v-model="forms.account.account_number"
+                        v-model="forms.fund_transfer.account_number"
                         @change="getBeneficiary"
                         type="text"
                         id="account_number"
@@ -180,13 +215,13 @@ onMounted(() => {
                         @change="previewConversion"
                     >
                         <option
-                            v-for="(currency, key, index) in currencies.rates"
+                            v-for="(rate, currency, index) in currencies.rates"
                             :key="index"
                             :value="{
-                                key: key,
-                                value: currency
+                                rate: rate,
+                                currency: currency
                             }">
-                            {{ key }} : {{ currency }}
+                            {{ rate }} : {{ currency }}
                         </option>
                     </select>
                 </div>

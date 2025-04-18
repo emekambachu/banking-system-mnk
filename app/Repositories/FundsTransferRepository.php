@@ -8,23 +8,20 @@ use Illuminate\Support\Facades\Auth;
 
 class FundsTransferRepository
 {
-    private $fundTransfer;
+    private FundTransfer $fundTransfer;
     public function __construct(){
         $this->fundTransfer = new FundTransfer();
     }
 
-    public function getFundsTransfer($select = [], $relations = []): Builder|FundTransfer
+    public function getFundsTransfers($select = [], $relations = []): Builder|FundTransfer
     {
         $query = $this->fundTransfer;
-
         if(!empty($select)) {
             $query = $query->select($select);
         }
-
         if(!empty($relations)) {
             $query = $query->with($relations);
         }
-
         return $query;
     }
 

@@ -51,6 +51,9 @@ class UserSeeder extends Seeder
                     'user_id' => $user->id,
                     'role_id' => $adminRoleId->id,
                 ]);
+                UserAccountNumber::factory(1)->create([
+                    'user_id' => $user->id,
+                ]);
             });
         }
 

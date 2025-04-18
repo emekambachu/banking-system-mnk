@@ -25,7 +25,7 @@ class FundTransferRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'amount' => ['required', 'numeric', 'min:1', 'regex:/^\d+(\.\d{1,2})?$/'],
+            'amount' => ['required', 'numeric', 'min:1', 'max:10000000', 'regex:/^\d+(\.\d{1,2})?$/'],
             'description' => 'nullable|string|max:255',
             'receiver_id' => 'required|exists:users,id',
             'currency' => 'required|string|max:3',

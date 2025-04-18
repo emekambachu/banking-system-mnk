@@ -74,7 +74,8 @@ class CurrencyConversionRepository
             $conversion = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
             return [
                 'success' => true,
-                'conversion' => $conversion,
+                'amount' => $conversion['result'],
+                'to_currency' => $conversion['query']['to'],
                 'status' => 200
             ];
 
