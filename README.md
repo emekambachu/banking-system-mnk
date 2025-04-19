@@ -21,7 +21,7 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
    ```bash
     cp .env.example .env
     ```
-4. **Generate user data using UserSeeder or register for the first time to become admin, then create other users:**
+4. **Generate role data using RoleSeeder or user data using UserSeeder or register for the first time to become admin, then create other users. The UserSeeder Handles all data generation roles, users, 2fa and account vcreation**
    ```bash
    php artisan db:seed --class=UserSeeder
    ```
@@ -38,7 +38,7 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
 ## Features
 - **Authentication:** Registration, login, and 2FA (middleware implemented). First user sign-up is automatically assigned as an admin, the rest becomes regular users.
 - **User Registration:** Users can register but will not have login access until the admin approves their account. Admin can approve or reject user accounts.
-- **Factories and seeders** There are factories and seeders used to generate dummy data. The UserSeeder is the most important one, as it creates an admin, 10 users with random names and emails, with Accounts and 2FA Activation
+- **Factories and seeders** There are factories and seeders used to generate dummy data. Run RoleSeeder first for roles, the UserSeeder is the most important one, as it creates an admin, 10 users with random names and emails, with Accounts and 2FA Activation
 - **2FA:** 2FA is enabled for all users by default on signup or creation. When a users logs in, they are required to enter a 2FA code sent to their email (Check log file to see 2FA OTP). The code is valid for 5 minutes.
 - **User Roles:** Admin and User roles with different permissions. Admin can manage users and accounts, while users can only manage their own accounts.
 - **Account Management:** Admin can create saving accounts with automatically generated unique account numbers, approved users and a default balance of 10,000 USD.

@@ -18,6 +18,11 @@ const previewConvertedAmount = ref({
     currency: '',
 });
 const errors = ref({});
+// Get user from parent component, AccountLayout.vue
+const props = defineProps({
+    auth_user: { type: Object, required: true }
+});
+const authUser = ref(props.auth_user);
 
 const forms = reactive({
     fund_transfer: {
@@ -82,7 +87,17 @@ const getCurrencies = async () => {
 
 const getBeneficiary = async () => {
     loading.value.beneficiary = true;
+    errors.value = {};
     try {
+        if(forms.fund_transfer.account_number === authUser.value.account_number){
+            errors.value = {
+                account_number: ['You cannot send funds to your own account']
+            }
+            forms.fund_transfer.account_number = '';
+            loading.value.beneficiary = false;
+            return;
+        }
+
         let formInputs = {
             account_number: forms.fund_transfer.account_number,
         };
@@ -95,11 +110,9 @@ const getBeneficiary = async () => {
         }else{
             errors.value = response.data.errors;
         }
-        console.log("Beneficial data", response.data);
 
     } catch (error) {
-        console.log("Beneficial errors", error);
-        if(error.response.data.errors){
+        if(error.response?.data?.errors){
             errors.value = error.response.data.errors;
         }
         if (error.response) {
@@ -147,7 +160,6 @@ const previewConversion = () => {
         }
 
         previewConvertedAmount.value.amount = (amount * currency).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-        console.log("Preview Converted Amount", previewConvertedAmount.value.amount);
     }
 }
 
