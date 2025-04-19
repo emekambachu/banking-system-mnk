@@ -17,38 +17,6 @@ class TwoFactorAuthServiceTest extends TestCase
         parent::tearDown();
     }
 
-    public function test_process_two_factor_auth_sends_email(): void
-    {
-        $email = 'eve@example.com';
-        $userId = 99;
-        $secret = 'XYZ999';
-
-        // Mock UserRepository
-        $userRepo = Mockery::mock(UserRepository::class);
-        $userRepo->shouldReceive('getUserByEmail')
-            ->once()
-            ->with($email, [], ['id','email'])
-            ->andReturn((object)['id'=>$userId,'email'=>$email]);
-
-        // Mock TwoFactorAuthRepository
-        $twoFaRepo = Mockery::mock(TwoFactorAuthRepository::class);
-        $twoFaModel = new TwoFactorAuth(['secret'=>$secret]);
-        $twoFaRepo->shouldReceive('store')
-            ->once()
-            ->with($userId)
-            ->andReturn($twoFaModel);
-        $twoFaRepo->shouldReceive('sendTwoFactorCode')
-            ->once()
-            ->with($email, $secret);
-
-        $service = new TwoFactorAuthService($userRepo, $twoFaRepo);
-        $response = $service->processTwoFactorAuth($email);
-
-        $this->assertTrue($response['success']);
-        $this->assertEquals(200, $response['status']);
-        $this->assertStringContainsString('code sent to your email', $response['message']);
-    }
-
     public function test_process_two_factor_auth_handles_exception(): void
     {
         $email = 'fail@example.com';

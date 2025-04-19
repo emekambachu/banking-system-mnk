@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use Illuminate\Database\Eloquent\Builder;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use App\Repositories\TransactionRepository;
@@ -45,7 +46,7 @@ class TransactionRepositoryTest extends TestCase
         $repo = new TransactionRepository();
         $builder = $repo->getTransactions(['*'], []); // returns Builder
 
-        $this->assertInstanceOf(\Illuminate\Database\Eloquent\Builder::class, $builder);
+        $this->assertInstanceOf(Builder::class, $builder);
 
         // Should be able to chain and count
         $count = $builder->where('user_id', $user->id)->count();

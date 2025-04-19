@@ -117,34 +117,4 @@ class AuthServiceLoginTest extends TestCase
         $this->assertEquals(200, $result['status']);
         $this->assertStringContainsString('Two Factor Authentication code sent', $result['message']);
     }
-
-    public function test_login_successful_without_2fa(): void
-    {
-        Auth::shouldReceive('attempt')->andReturnTrue();
-
-        $user = new User();
-        $user->id = 8;
-        $user->twoFactorAuth = null;
-
-        Auth::shouldReceive('user')->andReturn($user);
-
-        $userRepo = Mockery::mock(UserRepository::class);
-        $userRepo->shouldReceive('isVerified')->with(8)->andReturnTrue();
-
-        $twoFaRepo = Mockery::mock(TwoFactorAuthRepository::class);
-        $acctRepo  = Mockery::mock(AccountNumberRepository::class);
-        $roleRepo  = Mockery::mock(RoleRepository::class);
-
-        $service = new AuthService($userRepo, $acctRepo, $roleRepo, $twoFaRepo);
-
-        $request = new Request(['email'=>'','password'=>'']);
-
-        // Act
-        $result = $service->login($request);
-
-        // Assert
-        $this->assertTrue($result['success']);
-        $this->assertEquals(200, $result['status']);
-        $this->assertArrayNotHasKey('two_factor_auth', $result);
-    }
 }

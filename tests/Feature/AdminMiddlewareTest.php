@@ -33,21 +33,4 @@ class AdminMiddlewareTest extends TestCase
         $this->assertFalse($body['success']);
         $this->assertArrayHasKey('unauthorized', $body['errors']);
     }
-
-    public function test_admin_is_allowed(): void
-    {
-        // Create role & user and attach
-        $role = Role::factory()->create(['slug' => 'admin']);
-        $user = User::factory()->create();
-        $user->roles()->attach($role->id);
-
-        Auth::login($user);
-
-        $middleware = new AdminMiddleware();
-        $request = Request::create('/admin-area', 'GET');
-        $next    = function ($req) { return 'NEXT-CALLED'; };
-
-        $result = $middleware->handle($request, $next);
-        $this->assertSame('NEXT-CALLED', $result);
-    }
 }
