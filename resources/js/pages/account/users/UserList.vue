@@ -100,6 +100,7 @@ onMounted(() => {
             <p v-for="(result, index) in searchValues" :key="index">
                 {{ result+', ' }}
             </p>
+            <button @click.prevent="getUsers(1, 'get')" class="text-red-500 hover:text-red-700 font-bold ml-2">Clear Search</button>
         </div>
         <form @submit.prevent="getUsers(1, 'search')" class="w-full">
             <div class="grid grid-cols-5 gap-2">

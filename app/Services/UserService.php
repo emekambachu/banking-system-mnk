@@ -67,10 +67,10 @@ class UserService
                         ->orWhere('user_account_numbers.account_number', 'like' , '%'. $inputs['search_value'] .'%');
 
                 })->when(!empty($inputs['balance_greater_than']), static function ($query) use($inputs){
-                    $query->where('user_account_numbers.amount', '>=', $inputs['balance_greater_than']);
+                    $query->where('user_account_numbers.amount', '>', $inputs['balance_greater_than']);
 
                 })->when(!empty($inputs['balance_less_than']), static function ($query) use($inputs){
-                    $query->where('user_account_numbers.amount', '<=', $inputs['balance_less_than']);
+                    $query->where('user_account_numbers.amount', '<', $inputs['balance_less_than']);
 
                 })->when(!empty($inputs['date_joined_before']), static function ($query) use($inputs){
                     $query->where('users.created_at', '>=', $inputs['date_joined_before']);
