@@ -3,25 +3,45 @@
 namespace App\Services;
 
 use App\Mail\TwoFactorCodeMail;
+use App\Models\User;
 use App\Repositories\TwoFactorAuthRepository;
+use App\Repositories\UserRepository;
+use Exception;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
 use Random\RandomException;
 
 class TwoFactorAuthService
 {
+    protected UserRepository $userRepository;
     protected TwoFactorAuthRepository $twoFactorAuthRepository;
-    public function __construct()
+    public function __construct(
+        UserRepository $userRepository
+    )
     {
         $this->twoFactorAuthRepository = new TwoFactorAuthRepository();
+        $this->userRepository = $userRepository;
     }
 
-    /**
-     * @throws RandomException
-     */
-    public function process2FA($user): void
+    public function processTwoFactorAuth($userEmail): array
     {
-        $twoFactorAuth = $this->twoFactorAuthRepository->store($user);
-        $this->sendTwoFactorCode($user, $twoFactorAuth->secret);
+        try{
+            $userId = $this->userRepository->getUserByEmail($userEmail, [], ['id', 'email'])->id;
+            $newTwoFactorAuth = $this->twoFactorAuthRepository->store($userId);
+            $this->twoFactorAuthRepository->sendTwoFactorCode($userEmail, $newTwoFactorAuth->secret);
+            return [
+                'success' => true,
+                'status' => 200,
+                'message' => 'Two Factor Authentication code sent to your email.'
+            ];
+        }catch(Exception $exception){
+            Log::error($exception->getMessage());
+            return [
+                'success' => false,
+                'status' => 500,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ];
+        }
     }
 
     public function verify2FA($secret): array
@@ -44,9 +64,11 @@ class TwoFactorAuthService
     }
 
 
-    public function sendTwoFactorCode($user, $secret): void
+    public function sendTwoFactorCode($email, $secret): void
     {
-        Mail::to($user->email)->send(new TwoFactorCodeMail($secret));
+        // Send 2FA secret to log file because this is test
+        Log::info('Sending 2FA code to user: ' . $email . ' with code: ' . $secret);
+        Mail::to($email)->send(new TwoFactorCodeMail($secret));
     }
 
 }

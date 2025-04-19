@@ -5,6 +5,7 @@ namespace App\Services;
 use App\Http\Resources\UserResource;
 use App\Repositories\AccountNumberRepository;
 use App\Repositories\RoleRepository;
+use App\Repositories\TwoFactorAuthRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Cookie;
@@ -19,18 +20,18 @@ class AuthService
     protected UserRepository $userRepository;
     protected AccountNumberRepository $accountNumberRepository;
     protected RoleRepository $roleRepository;
-    protected TwoFactorAuthService $twoFactorAuthService;
+    protected TwoFactorAuthRepository $twoFactorAuthRepository;
     public function __construct(
         UserRepository $userRepository,
         AccountNumberRepository $accountNumberRepository,
         RoleRepository $roleRepository,
-        TwoFactorAuthService $twoFactorAuthService
+        TwoFactorAuthRepository $twoFactorAuthRepository
     )
     {
         $this->accountNumberRepository = $accountNumberRepository;
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
-        $this->twoFactorAuthService = $twoFactorAuthService;
+        $this->twoFactorAuthRepository = $twoFactorAuthRepository;
     }
 
     /**
@@ -48,7 +49,9 @@ class AuthService
             if ($user->twoFactorAuth && $user->twoFactorAuth->enabled) {
                 try {
                     // Generate a new 2FA code and send it to the user
-                    $this->twoFactorAuthService->process2FA($user);
+                    // Check code in log file
+                    $newTwoFactorAuth = $this->twoFactorAuthRepository->store($user->id);
+                    $this->twoFactorAuthRepository->sendTwoFactorCode($user->email, $newTwoFactorAuth->secret);
                     return [
                         'success' => true,
                         'two_factor_auth' => true,
@@ -92,15 +95,11 @@ class AuthService
 
     public function logout($request): JsonResponse
     {
-        // 1) Log out the user from the session guard
         Auth::logout();
-
-        // 2) Invalidate & regenerate session/CSRF
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 
-        // 3) Forget the session cookie on the client
-        $cookieName = config('session.cookie'); // typically 'laravel_session'
+        $cookieName = config('session.cookie');
         $forget = Cookie::forget($cookieName);
 
         return response()->json(['message' => 'Logged out'])
@@ -118,10 +117,16 @@ class AuthService
 
             $totalUsers = $this->userRepository->getUsers()->count();
 
+            // if first registered user, assign admin role
             if($totalUsers === 1) {
                 $this->roleRepository->getRoleBySlug('admin')->users()->attach($user->id);
+                $user->status = 1;
+                $user->save();
+
             }else{
                 $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
+                // Activate 2 factor authentication for non-admin users
+                $this->twoFactorAuthRepository->activate($user);
             }
 
             $userData = $this->userRepository->getUserById($user->id, ['roles', 'account'], ['id']);

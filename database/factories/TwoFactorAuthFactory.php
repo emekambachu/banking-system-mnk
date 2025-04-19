@@ -21,7 +21,7 @@ class TwoFactorAuthFactory extends Factory
     {
         return [
             'secret' => generateUniqueRandomString(TwoFactorAuth::class, 'secret', 6),
-            'expires_at' => $this->faker->dateTimeBetween('now', '+1 hour'),
+            'secret_expires_at' => $this->faker->dateTimeBetween('now', '+1 hour'),
             'enabled' => $this->faker->randomElement([true, false]),
         ];
     }

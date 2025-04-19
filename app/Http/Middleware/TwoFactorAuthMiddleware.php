@@ -19,7 +19,7 @@ class TwoFactorAuthMiddleware
     {
         $userWithTwoFactorAuth = Auth::user()?->load('twoFactorAuth');
         if($userWithTwoFactorAuth?->twoFactorAuth?->enabled){
-            if($userWithTwoFactorAuth?->twoFactorAuth?->verified_at && $userWithTwoFactorAuth?->twoFactorAuth?->verified_at < $userWithTwoFactorAuth?->twoFactorAuth?->expires_at){
+            if($userWithTwoFactorAuth?->twoFactorAuth?->secret_verified_at && $userWithTwoFactorAuth?->twoFactorAuth?->secret_verified_at < $userWithTwoFactorAuth?->twoFactorAuth?->secret_expires_at){
                 return $next($request);
             }
             return redirect('/login');

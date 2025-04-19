@@ -18,6 +18,7 @@ return new class extends Migration
             $table->timestamp('secret_expires_at')->nullable();
             $table->timestamp('secret_verified_at')->nullable();
             $table->boolean('enabled')->default(false);
+            $table->softDeletes();
             $table->timestamps();
         });
     }

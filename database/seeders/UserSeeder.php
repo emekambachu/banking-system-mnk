@@ -12,6 +12,10 @@ use Illuminate\Database\Seeder;
 
 class UserSeeder extends Seeder
 {
+//    public function __construct(){
+//
+//    }
+
     /**
      * Run the database seeds.
      */
@@ -40,17 +44,19 @@ class UserSeeder extends Seeder
             }
         }
 
-        $adminRoleId = Role::where('slug', 'admin')->first();
+        $adminRole = Role::where('slug', 'admin')->first();
+        $userRole = Role::where('slug', 'user')->first();
 
         $getAdminUser = User::with('roles')->whereHas('roles', function ($query) {
             $query->where('slug', 'admin');
         })->first();
 
+        // Create an admin user if it doesn't exist
         if(!$getAdminUser){
-            User::factory(1)->create()->each(function ($user) use ($adminRoleId) {
+            User::factory(1)->create()->each(function ($user) use ($adminRole) {
                 UserRole::create([
                     'user_id' => $user->id,
-                    'role_id' => $adminRoleId->id,
+                    'role_id' => $adminRole->id,
                 ]);
                 UserAccountNumber::factory(1)->create([
                     'user_id' => $user->id,
@@ -59,7 +65,7 @@ class UserSeeder extends Seeder
         }
 
         // Create 10 users with random data
-        User::factory(10)->create()->each(function ($user) {
+        User::factory(10)->create()->each(function ($user) use ($userRole) {
 
             UserAccountNumber::factory(1)->create([
                 'user_id' => $user->id,
@@ -71,7 +77,7 @@ class UserSeeder extends Seeder
 
             UserRole::create([
                 'user_id' => $user->id,
-                'role_id' => 2, // Assuming 2 is the ID for the user role
+                'role_id' => $userRole->id,
             ]);
 
             TwoFactorAuth::factory()->create([
