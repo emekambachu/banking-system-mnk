@@ -65,6 +65,7 @@ class FundsTransferService
                 $senderAccount->currency,
                 $inputs['currency'],
                 $inputs['amount'],
+                $senderAccount->currency === $inputs['currency']
             );
             if(!$convertedCurrency['success']){
                 Log::error('Currency conversion failed: ' . $convertedCurrency['error']);
@@ -99,7 +100,7 @@ class FundsTransferService
                 'user_id' => $sender->id,
                 'fund_transfer_id' => $transferredFunds->id,
                 'amount' => $inputs['amount'],
-                'currency' => $sender->currency,
+                'currency' => $senderAccount->currency,
                 'type' => 'debit',
                 'description' => $inputs['description'],
             ]);

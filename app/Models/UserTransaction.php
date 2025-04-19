@@ -31,4 +31,8 @@ class UserTransaction extends Model
     {
         return $this->belongsTo(FundTransfer::class, 'fund_transfer_id', 'id');
     }
+    public function account(): BelongsTo
+    {
+        return $this->belongsTo(UserAccountNumber::class, 'user_id', 'user_id');
+    }
 }

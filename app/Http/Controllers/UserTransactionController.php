@@ -22,10 +22,10 @@ class UserTransactionController extends Controller
     {
         try{
             $transactions = $this->transactionRepository
-                ->getTransactions(['*'], ['fundTransfer:currency,id'])
+                ->getTransactions(['*'], ['fundTransfer:currency,id', 'account'])
                 ->where('user_id', $id)
                 ->latest()
-                ->paginate(10);
+                ->paginate(12);
 
             return response()->json([
                 'success' => true,
@@ -45,9 +45,10 @@ class UserTransactionController extends Controller
     public function myTransactions(): JsonResponse
     {
         try{
-            $transactions = $this->transactionRepository->getTransactions()
+            $transactions = $this->transactionRepository->getTransactions([], ['account'])
                 ->where('user_id', Auth::user()->id)
-                ->latest()->paginate(10);
+                ->latest()
+                ->paginate(12);
             return response()->json([
                 'success' => true,
                 'transactions' => TransactionResource::collection($transactions)->response()->getData(true),

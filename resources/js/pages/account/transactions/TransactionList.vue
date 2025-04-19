@@ -40,7 +40,7 @@ const getTransactions = async (page = 1) => {
 
     try {
         let response;
-        if(myTransactions) {
+        if(myTransactions.value) {
             response = await apiClient.get('/users/my-transactions?page=' + page);
         } else {
             response = await apiClient.get('/users/' + id.value + '/transactions?page=' + page);
@@ -63,7 +63,7 @@ const getTransactions = async (page = 1) => {
     loading.value = false;
 };
 
-onBeforeMount(() => {
+onMounted(() => {
     getTransactions();
 });
 

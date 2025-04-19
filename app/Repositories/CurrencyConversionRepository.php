@@ -3,8 +3,6 @@
 namespace App\Repositories;
 
 use GuzzleHttp\Client;
-use http\Env\Response;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\Log;
 
 class CurrencyConversionRepository
@@ -64,17 +62,30 @@ class CurrencyConversionRepository
         }
     }
 
-    public function convertCurrency($from, $to, $amount): array
+    public function convertCurrency($from, $to, $amount, $senderHasCurrency): array
     {
         $this->checkAccessKey();
         $apiUrl = "https://api.exchangeratesapi.io/v1/convert?access_key={$this->accessKey}&from={$from}&to={$to}&amount={$amount}";
+        $spread = 0.01;
 
         try {
             $response = $this->client->get($apiUrl);
             $conversion = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
+
+            if (!isset($conversion['result'], $conversion['query']['to'])) {
+                throw new \RuntimeException('Invalid API response structure');
+            }
+
+            $convertedAmount = $conversion['result'];
+
+            if(!$senderHasCurrency){
+                Log::error('Sender does not have the currency');
+                $convertedAmount *= (1 - $spread);
+            }
+
             return [
                 'success' => true,
-                'amount' => $conversion['result'],
+                'amount' => $convertedAmount,
                 'to_currency' => $conversion['query']['to'],
                 'status' => 200
             ];

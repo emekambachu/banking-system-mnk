@@ -64,7 +64,7 @@ const updateUserStatus = async () => {
                 Account Number: {{ user.account_number }}
             </p>
             <p>
-                Balance: {{ new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(user.amount) }}
+                Balance: {{ user.currency }} {{ new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(user.amount) }}
             </p>
             <p>
                 Account Type: {{ user.account_type }}
