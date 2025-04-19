@@ -50,13 +50,12 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
 - **Testing:** Unit and integration tests for Controllers, Services and Repositories.
 
 ## What i would like to add if given more time
-- **User Interface:** Improve the UI/UX of the application using Tailwind CSS.
+- **More tests:** I would like to write more tests to endure application reliability.
 - **Notifications:** Implement a notification system to inform users about important events (e.g., successful fund transfers, account approvals).
 - **Email Verification:** Implement email verification for user registration.
 - **Password Reset:** Implement a password reset feature for users.
 - **Containerization:** Containerize the application using Docker for easier deployment.
 - **State management for frontend:** Implement Pinia for state management in the Vue.js frontend.
 - **Front-end Testing:** Add unit and integration tests for the Vue.js components using Cypress.
-- **Performance Optimization:** Optimize the application for better performance and scalability.
 - **Security Enhancements:** Implement additional security measures such as rate limiting.
 - **Logging and Monitoring:** Implement logging and monitoring to track application performance and errors.
