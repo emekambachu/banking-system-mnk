@@ -45,6 +45,14 @@ class AuthService
         if (Auth::attempt($credentials)) {
             $user = Auth::user()->load('twoFactorAuth');
 
+            if(!$this->userRepository->isVerified($user->id)){
+                return [
+                    'success' => false,
+                    'errors' => ['access' => ['User not verified']],
+                    'status' => 422
+                ];
+            }
+
             // Check if the user has 2FA enabled
             if ($user->twoFactorAuth && $user->twoFactorAuth->enabled) {
                 try {

@@ -84,21 +84,20 @@ class UserRepository
         })->first();
     }
 
-    public function updateUser($id, array $data): bool
+    public function isVerified($userId): bool
     {
-        return $this->user->where('id', $id)->update($data);
+        $user = $this->getUserById($userId, [], ['id', 'status']);
+        return $user?->status === 1;
     }
 
-    public function deleteUser($id, $relations = []): void
+    public function verifyUser($userId)
     {
-        $module = $this->user->with($relations)->find($id);
-
-        if (count($relations) > 0) {
-            foreach ($relations as $relation) {
-                $module->$relation()->delete();
-            }
+        $user = $this->getUserById($userId, [], ['id', 'status']);
+        if ($user->status === 1) {
+            $user->status = 0;
+        }else{
+            $user->status = 1;
         }
-
-        $module->delete();
+        return $user->save();
     }
 }

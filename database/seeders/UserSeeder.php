@@ -53,13 +53,21 @@ class UserSeeder extends Seeder
 
         // Create an admin user if it doesn't exist
         if(!$getAdminUser){
-            User::factory(1)->create()->each(function ($user) use ($adminRole) {
+            User::factory(1)->create([
+                'first_name' => 'Admin',
+                'last_name' => 'User',
+                'status' => 1,
+
+            ])->each(function ($user) use ($adminRole) {
                 UserRole::create([
                     'user_id' => $user->id,
                     'role_id' => $adminRole->id,
                 ]);
                 UserAccountNumber::factory(1)->create([
                     'user_id' => $user->id,
+                ]);
+                TwoFactorAuth::factory()->create([
+                    'user_id' => $user->id
                 ]);
             });
         }
