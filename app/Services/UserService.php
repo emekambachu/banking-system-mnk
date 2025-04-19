@@ -73,10 +73,10 @@ class UserService
                     $query->where('user_account_numbers.amount', '<', $inputs['balance_less_than']);
 
                 })->when(!empty($inputs['date_joined_before']), static function ($query) use($inputs){
-                    $query->where('users.created_at', '>=', $inputs['date_joined_before']);
+                    $query->where('users.created_at', '<=', $inputs['date_joined_before']);
 
                 })->when(!empty($inputs['date_joined_from']), static function ($query) use($inputs){
-                    $query->where('users.created_at', '<=', $inputs['date_joined_from']);
+                    $query->where('users.created_at', '>=', $inputs['date_joined_from']);
                 });
 
             })->distinct()->paginate(10);
