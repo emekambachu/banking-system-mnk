@@ -26,10 +26,8 @@ Route::group(['middleware' => ['auth:sanctum', 'two_factor_auth']], function () 
     Route::middleware(['admin'])->group(function () {
         Route::get('/users', [UserController::class, 'index']);
         Route::post('/users/search', [UserController::class, 'search']);
-        Route::put('/users/{id}/update', [UserController::class, 'update']);
+        Route::put('/users/{id}/update-status', [UserController::class, 'updateStatus']);
         Route::post('/users/create', [UserController::class, 'store']);
-        Route::delete('/users/{id}/delete', [UserController::class, 'destroy']);
-
         Route::get('/users/{id}/transactions', [UserTransactionController::class, 'transactions']);
     });
 

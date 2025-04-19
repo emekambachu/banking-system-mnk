@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Collection;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Log;
 
 class UserRepository
 {
@@ -90,14 +91,19 @@ class UserRepository
         return $user?->status === 1;
     }
 
-    public function verifyUser($userId)
+    public function verifyUser($userId): Model|Collection|Builder|array|null
     {
-        $user = $this->getUserById($userId, [], ['id', 'status']);
+        $user = $this->getUserById($userId);
+        if(!$user) {
+            Log::error('User not found with ID: ' . $userId);
+            return null;
+        }
         if ($user->status === 1) {
             $user->status = 0;
         }else{
             $user->status = 1;
         }
-        return $user->save();
+        $user->save();
+        return $user;
     }
 }

@@ -30,8 +30,8 @@ class UserResource extends JsonResource
             'roles' => $this->roles?->pluck('slug') ?? [],
 
             'status' => $this->status ?? null,
-            'created_at' => $this->created_at ?? null,
-            'updated_at' => $this->updated_at ?? null,
+            'created_at' => $this->created_at?->format('Y-m-d H:i:s'),
+            'updated_at' => $this->updated_at?->format('Y-m-d H:i:s'),
         ];
     }
 }

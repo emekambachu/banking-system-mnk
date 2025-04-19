@@ -1,16 +1,11 @@
 <script setup>
-import {ref, defineEmits, defineProps, onMounted} from "vue";
-import TrashIcon from "@/js/components/Icons/TrashIcon.vue";
-import EditIcon from "@/js/components/Icons/EditIcon.vue";
-import SlideOverModal from "@/js/components/Modals/SlideOverModal.vue";
-import UserForm from "@/js/pages/account/users/UserForm.vue";
+import {ref, defineProps} from "vue";
 import apiClient from "@/js/utils/apiClient.js";
+import PopupModal from "@/js/components/Modals/PopupModal.vue";
 import AnimateSpinIcon from "@/js/components/Icons/AnimateSpinIcon.vue";
 
-const showEditForm = ref(false);
-const showDeleteForm = ref(false);
+const showStatusModal = ref(false);
 const loading = ref(false);
-const deleted = ref(false);
 
 const props = defineProps({
   user: {
@@ -28,23 +23,18 @@ const props = defineProps({
 });
 
 const user = ref(props.user);
-const emit = defineEmits(['delete-user']);
 
-const updateUser = (event) => {
-  user.value = event;
-}
-
-const deleteUser = async () => {
+const updateUserStatus = async () => {
   loading.value = true;
-  await apiClient.delete(`/users/${user.value.id}`).then((response) => {
+  await apiClient.put(`/users/${user.value.id}/update-status`).then((response) => {
     if (response.data.success) {
-      deleted.value = true;
-      emit('delete-user', user.value.id);
+        user.value = response.data.user;
+        showStatusModal.value = false;
+      console.log("Updated", response.data);
     }
   }).catch((error) => {
     console.log(error);
   });
-
   loading.value = false;
 }
 
@@ -80,6 +70,16 @@ const deleteUser = async () => {
                 Account Type: {{ user.account_type }}
             </p>
         </td>
+        <td>
+            <p>
+                Status:
+                <span v-if="user.status === 1" class="text-emerald-700">Approved</span>
+                <span v-else class="text-rose-600">Blocked</span>
+            </p>
+            <p>
+                Date Joined: {{ user.created_at }}
+            </p>
+        </td>
         <td class="px-6 py-4">
             <div class="flex">
                 <router-link
@@ -90,48 +90,57 @@ const deleteUser = async () => {
                     </button>
                 </router-link>
                 <button
-                    @click.prevent="showEditForm = !showEditForm"
-                    class="bg-yellow-500 hover:bg-yellow-700 text-white font-bold py-2 px-4 mr-2 rounded">
-                    Edit
-                </button>
-                <button
-                    @click.prevent="showDeleteForm = !showDeleteForm"
-                    class="bg-rose-500 hover:bg-rose-700 text-white font-bold py-2 px-4 rounded">
-                    Delete
+                    v-if="auth_user.roles.includes('admin')"
+                    @click.prevent="showStatusModal = !showStatusModal"
+                    class="text-white font-bold py-2 px-4 mr-2 rounded"
+                    :class="[user.status === 1 ? 'bg-rose-700 hover:bg-rose-800' : 'bg-emerald-600 hover:bg-emerald-800']"
+                >
+                    <span v-if="user.status === 1">
+                        Block User
+                    </span>
+                    <span v-else>
+                        Approve User
+                    </span>
                 </button>
             </div>
         </td>
     </tr>
 
-    <SlideOverModal
-        title="Update User"
-        :show="showEditForm"
-        @close-modal="showEditForm = false"
+    <PopupModal
+        title="Update status"
+        :show="showStatusModal"
+        :user="user"
+        @close-modal="showStatusModal = false"
     >
-        <UserForm
-            :user="user"
-            @update-user="updateUser"
-        />
-    </SlideOverModal>
 
-    <SlideOverModal
-        title="Delete User"
-        :show="showDeleteForm"
-        @close-modal="showDeleteForm = false"
-    >
-        <h3 class="text-center">Are you sure you want to delete {{ user.name + " " + user.surname }}</h3>
-        <p class="text-center">This action cannot be undone.</p>
-        <div v-if="!loading && !deleted" class="flex justify-center mt-4">
-            <button @click.prevent="showDeleteForm = false" class="bg-gray-500 text-white px-4 py-2 rounded">Cancel</button>
-            <button @click.prevent="deleteUser(user.id)" class="bg-red-500 text-white px-4 py-2 rounded ml-2">Delete</button>
+        <div class="flex flex-col">
+            <p class="text-gray-500 mb-2 text-lg">
+                <span
+                    v-if="user.status === 1">Block </span> <span v-else>Approve </span>
+                <strong>{{ user.first_name + " " + user.last_name }}</strong>?
+            </p>
+            <div class="flex justify-end">
+                <button
+                    @click.prevent="updateUserStatus"
+                    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 mr-2 rounded"
+                >
+                    <AnimateSpinIcon v-if="loading" class="animate-spin" />
+                    <span v-else>
+                        <span v-if="user.status === 1">Block</span>
+                        <span v-else>Approve</span>
+                    </span>
+                </button>
+                <button
+                    @click.prevent="showStatusModal = false"
+                    class="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                >
+                    Cancel
+                </button>
+            </div>
         </div>
-        <div v-else-if="loading && !deleted" class="flex justify-center mt-4">
-          <AnimateSpinIcon class="animate-spin h-5 w-5 text-gray-200" />
-        </div>
-        <div v-else-if="deleted" class="flex justify-center mt-4">
-            <p class="text-rose-400">User deleted successfully.</p>
-        </div>
-    </SlideOverModal>
+
+    </PopupModal>
+
 </template>
 
 <style scoped>

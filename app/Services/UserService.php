@@ -4,7 +4,6 @@ namespace App\Services;
 
 use App\Http\Resources\UserResource;
 use App\Http\Resources\UserSearchResource;
-use App\Models\User;
 use App\Models\UserAccountNumber;
 use App\Repositories\AccountNumberRepository;
 use App\Repositories\RoleRepository;
@@ -12,7 +11,6 @@ use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Random\RandomException;
 
 class UserService
 {

@@ -28,7 +28,7 @@ class UserController extends Controller
     {
         try{
             $users = $this->userRepository->getUsers(
-                ['id', 'first_name', 'last_name', 'mobile', 'email', 'address', 'created_at'],
+                ['id', 'first_name', 'last_name', 'mobile', 'email', 'address', 'created_at', 'status'],
                 ['account', 'roles']
             )->orderBy('last_name', 'asc')->paginate(10);
 
@@ -68,6 +68,32 @@ class UserController extends Controller
         try {
             $response = $this->userService->storeUsers($request->all());
             return response()->json($response, $response['status']);
+
+        }catch (\Exception $exception){
+
+            Log::error($exception->getMessage());
+            return response()->json([
+                'success' => false,
+                'errors' => ['server_error' => ['Unexpected error occurred']],
+            ], 500);
+        }
+    }
+
+    public function updateStatus($id): JsonResponse
+    {
+        try {
+            $user = $this->userRepository->verifyUser($id);
+            if(!$user) {
+                return response()->json([
+                    'success' => false,
+                    'errors' => ['user_not_found' => ['User not found']],
+                    'user' => null,
+                ], 404);
+            }
+            return response()->json([
+                'success' => true,
+                'user' => new UserResource($user),
+            ]);
 
         }catch (\Exception $exception){
 

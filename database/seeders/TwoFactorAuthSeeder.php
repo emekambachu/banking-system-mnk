@@ -31,9 +31,7 @@ class TwoFactorAuthSeeder extends Seeder
             ->whereDoesntHave('twoFactorAuth')->get();
 
         foreach ($users as $user) {
-            if ($user->roles->contains('slug', 'user')) {
-                $this->twoFactorAuthRepository->activate($user);
-            }
+            $this->twoFactorAuthRepository->activate($user);
         }
 
     }
