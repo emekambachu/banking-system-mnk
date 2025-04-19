@@ -23,7 +23,7 @@ const props = defineProps({
 });
 const authUser = ref(props.auth_user);
 const myTransactions = computed(() => {
-    return window.location.href === 'account/my-transactions';
+    return window.location.pathname === '/account/my-transactions';
 });
 
 const transactions = ref([]);
@@ -64,6 +64,7 @@ const getTransactions = async (page = 1) => {
 };
 
 onMounted(() => {
+    console.log("Test transactions", myTransactions.value, window.location.pathname);
     getTransactions();
 });
 

@@ -21,7 +21,7 @@ class TransactionResource extends JsonResource
             'amount' => $this->amount,
             'currency' => $this->account?->currency ?? null,
             'type' => $this->type,
-            'description' => $this->description,
+            'description' => $this->description ?? '',
             'created_at' => $this->created_at->format('Y-m-d H:i:s'),
         ];
     }

@@ -7,6 +7,7 @@ use App\Http\Resources\UserSearchResource;
 use App\Models\UserAccountNumber;
 use App\Repositories\AccountNumberRepository;
 use App\Repositories\RoleRepository;
+use App\Repositories\TwoFactorAuthRepository;
 use App\Repositories\UserRepository;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -17,15 +18,18 @@ class UserService
     protected UserRepository $userRepository;
     protected AccountNumberRepository $accountNumberRepository;
     protected RoleRepository $roleRepository;
+    protected TwoFactorAuthRepository $twoFactorAuthRepository;
     public function __construct(
         UserRepository $userRepository,
         AccountNumberRepository $accountNumberRepository,
-        RoleRepository $roleRepository
+        RoleRepository $roleRepository,
+        TwoFactorAuthRepository $twoFactorAuthRepository
     )
     {
         $this->accountNumberRepository = $accountNumberRepository;
         $this->userRepository = $userRepository;
         $this->roleRepository = $roleRepository;
+        $this->twoFactorAuthRepository = $twoFactorAuthRepository;
     }
 
     public function search($inputs): array
@@ -122,7 +126,7 @@ class UserService
                 }
 
                 $this->accountNumberRepository->createAccountNumberForUser($user);
-
+                $this->twoFactorAuthRepository->activate($user);
                 $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
 
                 $newUser = new UserResource($user);

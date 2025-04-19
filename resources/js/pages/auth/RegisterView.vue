@@ -32,6 +32,13 @@ const register = async () => {
         let response = await apiClient.post(`/register`, form);
         if(response.data.success){
             submitted.value = true;
+            errors.value = {};
+            // Reset form using iteration
+            for (const key in form) {
+                if (form.hasOwnProperty(key)) {
+                    form[key] = '';
+                }
+            }
             if(response.data.user?.roles?.includes("admin")){
                 window.location.href = '/account/dashboard';
             }
@@ -59,7 +66,7 @@ const validatePhone = (event) => {
     }
     let valid = formValidations.validateMobileNumber(event.target.value);
     if (!valid) {
-        errors.value['mobile'] = ["Wrong format, international mobile number required"];
+        errors.value['mobile'] = ["Wrong format"];
         return false;
     }else{
         errors.value['mobile'] = [];

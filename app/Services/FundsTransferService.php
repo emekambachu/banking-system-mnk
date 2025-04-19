@@ -120,7 +120,7 @@ class FundsTransferService
             $senderAccount->save();
 
             // Update receiver account balance
-            $receiverAccount->amount -= $inputs['amount'];
+            $receiverAccount->amount += $inputs['amount'];
             $receiverAccount->save();
 
             DB::commit();

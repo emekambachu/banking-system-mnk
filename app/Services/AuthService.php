@@ -122,6 +122,7 @@ class AuthService
         try {
             $user = $this->userRepository->storeUser($userData);
             $this->accountNumberRepository->createAccountNumberForUser($user);
+            $this->twoFactorAuthRepository->activate($user);
 
             $totalUsers = $this->userRepository->getUsers()->count();
 
@@ -133,8 +134,6 @@ class AuthService
 
             }else{
                 $this->roleRepository->getRoleBySlug('user')->users()->attach($user->id);
-                // Activate 2 factor authentication for non-admin users
-                $this->twoFactorAuthRepository->activate($user);
             }
 
             $userData = $this->userRepository->getUserById($user->id, ['roles', 'account'], ['id']);

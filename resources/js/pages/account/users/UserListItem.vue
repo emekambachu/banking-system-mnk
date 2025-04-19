@@ -90,7 +90,7 @@ const updateUserStatus = async () => {
                     </button>
                 </router-link>
                 <button
-                    v-if="auth_user.roles.includes('admin')"
+                    v-if="auth_user.roles.includes('admin') && user.id !== auth_user.id"
                     @click.prevent="showStatusModal = !showStatusModal"
                     class="text-white font-bold py-2 px-4 mr-2 rounded"
                     :class="[user.status === 1 ? 'bg-rose-700 hover:bg-rose-800' : 'bg-emerald-600 hover:bg-emerald-800']"
