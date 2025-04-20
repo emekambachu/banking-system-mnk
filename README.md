@@ -36,7 +36,7 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
 - **Database:** SQLite
 
 ## Features
-- **Authentication:** Registration, login, and 2FA (middleware implemented). First user sign-up is automatically assigned as an admin, the rest becomes regular users.
+- **Authentication:** Registration, login, and 2FA (middleware implemented). First user sign-up is automatically assigned as an admin, the rest becomes regular users. Authentication is handled using Laravel's sanctum http-only cookies.
 - **User Registration:** Users can register but will not have login access until the admin approves their account. Admin can approve or reject user accounts.
 - **Factories and seeders** There are factories and seeders used to generate dummy data. Run RoleSeeder first for roles, the UserSeeder is the most important one, as it creates an admin, 10 users with random names and emails, with Accounts and 2FA Activation
 - **2FA:** 2FA is enabled for all users by default on signup or creation. When a users logs in, they are required to enter a 2FA code sent to their email (Check log file to see 2FA OTP). The code is valid for 5 minutes.
@@ -49,9 +49,20 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
 - **Clean Code:** Usage of dependency injection, Services, Repositories, separation/encapsulation of logic, and adherence to SOLID principles.
 - **Testing:** Unit and integration tests for Controllers, Services and Repositories.
 
+## Practices
+- **SOLID Principles:** The code is designed following SOLID principles to ensure maintainability and scalability.
+- **Design Patterns:** The application uses design patterns such as Repository Pattern and Service Layer to separate concerns and improve code organization. Repository Pattern is used to abstract data access logic, while Service Layer encapsulates business logic. Factory Pattern is used to create instances of classes, making the code more flexible and easier to maintain. Observer Pattern is used to implement the hash generation of transactions.
+- **Dependency Injection:** The application uses dependency injection to manage class dependencies, making the code more testable and maintainable.
+- **Type Hinting:** Type hinting is used throughout the codebase to ensure type safety and improve code readability.
+- **Middleware:** Middleware is used for 2FA verification and role-based access control.
+- **Validation:** Laravel's request validation class are used to validate request data.
+- **Error Handling:** Custom error handling is implemented to provide meaningful error messages to users.
+- **Logging:** The application uses Laravel's built-in logging capabilities to log important events and errors.
+
 ## What i would like to add if given more time
 - **More tests:** I would like to write more tests to endure application reliability.
 - **Notifications:** Implement a notification system to inform users about important events (e.g., successful fund transfers, account approvals).
+- **Asynchronous:** Handle events in jobs/queues like emails, etc.
 - **Email Verification:** Implement email verification for user registration.
 - **Password Reset:** Implement a password reset feature for users.
 - **Containerization:** Containerize the application using Docker for easier deployment.
@@ -59,3 +70,7 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
 - **Front-end Testing:** Add unit and integration tests for the Vue.js components using Cypress.
 - **Security Enhancements:** Implement additional security measures such as rate limiting.
 - **Logging and Monitoring:** Implement logging and monitoring to track application performance and errors.
+- **Caching and Optimization:** Implement caching strategies to improve performance and reduce database load.
+
+## Question from my end
+- **Based on the instruction, If all initial user creation has $10,000 USD, This means we can't send a different currency like GBP or Euro to another user, they all have USD. I know this is just a test, How do you want me to handle this?**

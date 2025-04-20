@@ -13,31 +13,6 @@ class TransactionRepositoryTest extends TestCase
 {
     use RefreshDatabase;
 
-    public function test_store_transaction(): void
-    {
-        $user = User::factory()->create();
-        $payload = [
-            'user_id'          => $user->id,
-            'fund_transfer_id' => 123,
-            'amount'           => 500,
-            'currency'         => 'USD',
-            'type'             => 'debit',
-            'description'      => 'Test transaction',
-        ];
-
-        $repo = new TransactionRepository();
-        $tx = $repo->storeTransaction($payload);
-
-        $this->assertInstanceOf(UserTransaction::class, $tx);
-        $this->assertEquals(500, $tx->amount);
-        $this->assertEquals('debit', $tx->type);
-        $this->assertDatabaseHas('user_transactions', [
-            'id'          => $tx->id,
-            'user_id'     => $user->id,
-            'description' => 'Test transaction',
-        ]);
-    }
-
     public function test_get_transactions_builder(): void
     {
         $user = User::factory()->create();

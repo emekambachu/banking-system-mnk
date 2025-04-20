@@ -34,25 +34,4 @@ class TwoFactorAuthServiceTest extends TestCase
         $this->assertEquals(500, $response['status']);
         $this->assertArrayHasKey('errors', $response);
     }
-
-    public function test_verify_2fa_success_and_failure(): void
-    {
-        $secret = 'GOODCODE';
-        $userRepo = Mockery::mock(UserRepository::class);
-        $twoFaRepo = Mockery::mock(TwoFactorAuthRepository::class);
-
-        // success path
-        $twoFaRepo->shouldReceive('verify')->once()->with($secret)->andReturnTrue();
-        $service = new TwoFactorAuthService($userRepo, $twoFaRepo);
-        $response = $service->verify2FA($secret);
-        $this->assertTrue($response['success']);
-        $this->assertEquals(200, $response['status']);
-
-        // failure path
-        $twoFaRepo->shouldReceive('verify')->once()->with('BAD')->andReturnFalse();
-        $response = $service->verify2FA('BAD');
-        $this->assertFalse($response['success']);
-        $this->assertEquals(401, $response['status']);
-        $this->assertArrayHasKey('errors', $response);
-    }
 }

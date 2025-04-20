@@ -144,7 +144,7 @@ class AuthService
                 'success' => true,
                 'user' => new UserResource($userData),
                 'message' => 'User Created Successfully',
-                'status' => 200,
+                'status' => 201,
             ];
 
         } catch (\Exception $e) {
