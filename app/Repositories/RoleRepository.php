@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use App\Models\Role;
 use App\Models\UserRole;
+use Illuminate\Support\Str;
 
 class RoleRepository
 {
@@ -13,6 +14,23 @@ class RoleRepository
     {
         $this->role = new Role();
         $this->userRole = new UserRole();
+    }
+
+    public function role(): Role
+    {
+        return $this->role;
+    }
+
+    public function checkOrAddRoles(array $roles): void
+    {
+        foreach ($roles as $role) {
+            if (!$this->role->where('slug', $role)->exists()) {
+                $this->role->create([
+                    'name' => $role,
+                    'slug' => Str::slug($role),
+                ]);
+            }
+        }
     }
 
     public function addRoleToUser($userId, $roleId): void

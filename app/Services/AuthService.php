@@ -118,6 +118,9 @@ class AuthService
     {
         $userData['password'] = Hash::make($userData['password']);
 
+        // Check or add roles (Included this for test purposes)
+        $this->roleRepository->checkOrAddRoles(['Admin', 'User']);
+
         DB::beginTransaction();
         try {
             $user = $this->userRepository->storeUser($userData);

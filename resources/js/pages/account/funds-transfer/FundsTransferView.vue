@@ -50,6 +50,18 @@ const sendFunds = async () => {
 
         if(response.data.success){
             submitted.value = true;
+
+            // clear the form with iteration
+            for (const key in forms.fund_transfer) {
+                if (forms.fund_transfer.hasOwnProperty(key)) {
+                    if(key === 'amount') {
+                        forms.fund_transfer[key] = 0.00;
+                    }else{
+                        forms.fund_transfer[key] = '';
+                    }
+                }
+            }
+
             console.log("Funds Transfer Sent");
         }
 
@@ -159,7 +171,15 @@ const previewConversion = () => {
             return;
         }
 
-        previewConvertedAmount.value.amount = (amount * currency).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        // calculate the conversion rate and spread
+        const SPREAD_PERCENTAGE = 0.01; // 1% spread
+        let spread = authUser.value.currency !== forms.fund_transfer.currency.currency ? 1 - SPREAD_PERCENTAGE : 1;
+
+        let adjustedRate = currency * spread;
+        previewConvertedAmount.value.amount = (amount * adjustedRate).toLocaleString(undefined, {
+            minimumFractionDigits: 2,
+            maximumFractionDigits: 2
+        });
     }
 }
 

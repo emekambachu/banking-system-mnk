@@ -21,9 +21,27 @@ A robust Banking System built with Laravel (backend) and Vue.js with Tailwind CS
    ```bash
     cp .env.example .env
     ```
-4. **Generate role data using RoleSeeder or user data using UserSeeder or register for the first time to become admin, then create other users. The UserSeeder Handles all data generation roles, users, 2fa and account vcreation**
+
+4. **Generate application key:**
    ```bash
-   php artisan db:seed --class=UserSeeder
+   php artisan key:generate
+   ```
+
+5. **Start Server:**
+   ```bash
+   php artisan serve
+   npm run dev
+   ```
+
+6. **Run migrations to create the necessary tables**
+   ```bash
+   php artisan migrate
+   ```
+   
+7. **Generate dummy data using factories and seeders**
+   ```bash
+   php artisan db:seed --class=RoleSeeder (must run this before registration)
+   php artisan db:seed --class=UserSeeder (run this if you don't want to manually register as admin and want to populate the database with dummy data')
    ```
 
 ## Technologies Used
